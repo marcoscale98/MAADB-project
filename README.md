@@ -13,7 +13,7 @@ Progetto d'esame per MAADB
   - raccogliere le parole nuove presenti nei tweets ma non nelle risorse lessicali (N_twittter_words(Y)- N_shared_words(X,Y))
 ![image](https://user-images.githubusercontent.com/43850400/118098215-ea947000-b3d3-11eb-9a94-4d41571c25f8.png)
 
-## Osservazioni su Risorse messaggi Tweetter
+## Osservazioni su Risorse messaggi Twitter
 ### Tag
 USERNAME : indica un username di un utente Twitter.  
 URL : indica un url.
