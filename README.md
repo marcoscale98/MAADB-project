@@ -3,14 +3,28 @@ Progetto d'esame per MAADB
 ## Schema di lavoro
 [Descrizione progetto](https://docs.google.com/document/d/1i3TSJpyr4vw-edKBX1XNuy52f8_Sem0aPWmo6fBpuBs/edit?ts=57308c63#heading=h.oublcismo327)
 ### Cosa c'è da creare?
-- **Database di backup**: database dove mantenere le risorse lessicali e i messaggi di twitter (questi poi verranno recuperati come uno stram teoricamente infinito di dati)
-- Pipeline di **preprocessing** dei dati testuali in python (con lib. *nltk* oppure *gensim*)
+- **Database di backup**: database dove mantenere le risorse lessicali e i messaggi di twitter (questi poi verranno recuperati come uno stream teoricamente infinito di dati)
+- Pipeline di **preprocessing** dei tweets in python (con lib. *nltk* oppure *gensim*)
+    Devo ancora capire in che ordine
+    - Eliminare USERNAME e URL
+    - processare gli hashtag: possiamo contarli e fare statistiche anche su quelli o possiamo buttarli
+    - processare emoji ed emoticons: contarli per fare statistiche e trovare sovrapposizioni di uso tra diverse emozioni
+    - riconoscere le forme di slang e sostituirle con le forme lunghe
+    - trovare la punteggiatura e sostituirla con spazi bianchi
+    - trasformare tutto a lower case
+    - word tokenization: trovare le parole con _nltk.tokenize.word_tokenize_
+    - eliminare stop words
+    - POS tagging
+    - lemming
+    - conteggio parole
+    
 - **Database di analytics**: database dove mantenere le statistiche elaborate richieste:
   - parole più **frequenti** nei tweet (graficamente visualizzate con una word cloud)
   - emoji più frequenti nei tweet (graficamente visualizzate con una word cloud)
   - emoticons più frequenti nei tweet (graficamente visualizzate con una word cloud)
-  - per ciascun sentimento, la percentuale delle parole delle risorse lessicali presenti nei tweets (visualizzarle con un istogramma)
-  - raccogliere le parole nuove presenti nei tweets ma non nelle risorse lessicali (N_twittter_words(Y)- N_shared_words(X,Y))
+  - per ciascun sentimento (X e Y sono sentimenti), la percentuale delle parole delle risorse lessicali presenti nei tweets: _perc_persence_lex_words(X,Y)_ (visualizzarle con un istogramma)
+  - raccogliere le parole nuove presenti nei tweets ma non nelle risorse lessicali (_N_twittter_words(Y)- N_shared_words(X,Y)_)
+- **eventualmente nuova risorsa su DB**: Memorizzare le ‘nuove’ parole trovate nei tweet ma assenti nelle risorse fornite (se alla fine del conteggio saranno altamente presenti avremo trovato nuova parole da aggiungere alle risorse o avremo creato una risorsa  aggiuntiva!)
 ![image](https://user-images.githubusercontent.com/43850400/118098215-ea947000-b3d3-11eb-9a94-4d41571c25f8.png)
 
 ## Osservazioni su Risorse messaggi Twitter
@@ -22,6 +36,7 @@ Altri tag potrei cercarli con uno script python
 ## Osservazioni su Risorse lessicali emozioni
 Ricordiamo il modello delle emozioni che dobbiamo considerare nel progetto
 ![image](res\emotion_model.png)
+
 Adesso vediamo invece come sono organizzate le risorse a disposizione:
 - Ogni cartella contiene risorse su una determinata **emozione** ad eccezione di:
     - `_MACOSX` inutile
@@ -47,7 +62,8 @@ Adesso vediamo invece come sono organizzate le risorse a disposizione:
     - **Sadness**
     - **Surprise**
     - **Trust**  
-    Quelle in grassetto sono le emozioni presenti anche nei file di `Twitter messaggi` col seguente formato `dataset_dt_<emozione.lower()>_60k.txt`
+    
+Quelle in grassetto sono le emozioni presenti anche nei file di `Twitter messaggi` col seguente formato `dataset_dt_<emozione.lower()>_60k.txt`
 ### Descrizione risorse
 ![image](res\lexica_organization.png)
 - **EmoSN**: EmoSenticNet includes 13,189 entries for the six Ekman’s emotions of Joy, Sadness, Anger, Fear, Surprise and Disgust. The resource was developed by assigning WordNet Affect emotion labels to SenticNet concepts [Poria et al. 2013; Poria et al. 2014]. The last one is a list of common-sense knowledge concepts with a polarity score [Cambria et al. 2014] referring to the multidisciplinary approach of Sentic Computing [Cambria and Hussain 2015].
