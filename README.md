@@ -19,8 +19,10 @@ USERNAME : indica un username di un utente Twitter.
 URL : indica un url.
 
 Altri tag potrei cercarli con uno script python
-
-##Osservazioni su Risorse lessicali emozioni
+## Osservazioni su Risorse lessicali emozioni
+Ricordiamo il modello delle emozioni che dobbiamo considerare nel progetto
+![image](res\emotion_model.png)
+Adesso vediamo invece come sono organizzate le risorse a disposizione:
 - Ogni cartella contiene risorse su una determinata **emozione** ad eccezione di:
     - `_MACOSX` inutile
     - `ConScore` contiene tsv file per associare ad ogni valore uno score
@@ -46,3 +48,9 @@ Altri tag potrei cercarli con uno script python
     - **Surprise**
     - **Trust**  
     Quelle in grassetto sono le emozioni presenti anche nei file di `Twitter messaggi` col seguente formato `dataset_dt_<emozione.lower()>_60k.txt`
+### Descrizione risorse
+![image](res\lexica_organization.png)
+- **EmoSN**: EmoSenticNet includes 13,189 entries for the six Ekman’s emotions of Joy, Sadness, Anger, Fear, Surprise and Disgust. The resource was developed by assigning WordNet Affect emotion labels to SenticNet concepts [Poria et al. 2013; Poria et al. 2014]. The last one is a list of common-sense knowledge concepts with a polarity score [Cambria et al. 2014] referring to the multidisciplinary approach of Sentic Computing [Cambria and Hussain 2015].
+- **SS**: SentiSense is a concept-based affective lexicon with a wide set of categories developed by Carrillo de Albornoz [Carrillo de Albornoz et al. 2012], including 5,496 words and 2,190 synsets from WordNet, labeled with an emotion from a set of 14 categories.
+- ANEW: The dictionary Affective Norms for English Words includes terms rated from 1 to 9 for each of the three dimensions of Valence, Arousal and Dominance.
+- DAL: The Dictionary of Affective Language developed by Whissell [Whissell 2009] contains words belonging to the dimensions of Pleasantness, Activation and Imagery. The 8,742 terms are rated in a three-point scale.
