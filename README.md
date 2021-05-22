@@ -3,7 +3,7 @@ Progetto d'esame per MAADB
 ## Schema di lavoro
 [Descrizione progetto](https://docs.google.com/document/d/1i3TSJpyr4vw-edKBX1XNuy52f8_Sem0aPWmo6fBpuBs/edit?ts=57308c63#heading=h.oublcismo327)
 ### Cosa c'è da creare?
-- **Database di backup**: database dove mantenere le risorse lessicali e i messaggi di twitter (questi poi verranno recuperati come uno stream teoricamente infinito di dati)
+- **Database di buffer**: database dove mantenere le risorse lessicali e i messaggi di twitter (questi poi verranno recuperati come uno stream teoricamente infinito di dati)
 - Pipeline di **preprocessing** dei tweets in python (con lib. *nltk* oppure *gensim*)
     Devo ancora capire in che ordine
     - Eliminare USERNAME e URL
@@ -13,8 +13,8 @@ Progetto d'esame per MAADB
     - trovare la punteggiatura e sostituirla con spazi bianchi
     - trasformare tutto a lower case
     - word tokenization: trovare le parole con _nltk.tokenize.word_tokenize_
-    - eliminare stop words
     - POS tagging
+    - eliminare stop words
     - lemming
     - conteggio parole
     
@@ -24,7 +24,7 @@ Progetto d'esame per MAADB
   - emoticons più frequenti nei tweet (graficamente visualizzate con una word cloud)
   - per ciascun sentimento (X e Y sono sentimenti), la percentuale delle parole delle risorse lessicali presenti nei tweets: _perc_persence_lex_words(X,Y)_ (visualizzarle con un istogramma)
   - raccogliere le parole nuove presenti nei tweets ma non nelle risorse lessicali (_N_twittter_words(Y)- N_shared_words(X,Y)_)
-- **eventualmente nuova risorsa su DB**: Memorizzare le ‘nuove’ parole trovate nei tweet ma assenti nelle risorse fornite (se alla fine del conteggio saranno altamente presenti avremo trovato nuova parole da aggiungere alle risorse o avremo creato una risorsa  aggiuntiva!)
+- **eventualmente nuova risorsa su DB**: Memorizzare le _nuove parole_ trovate nei tweet ma assenti nelle risorse fornite (se alla fine del conteggio saranno altamente presenti avremo trovato nuova parole da aggiungere alle risorse o avremo creato una risorsa  aggiuntiva!)
 ![image](https://user-images.githubusercontent.com/43850400/118098215-ea947000-b3d3-11eb-9a94-4d41571c25f8.png)
 
 ## Osservazioni su Risorse messaggi Twitter

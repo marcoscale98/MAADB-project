@@ -8,8 +8,8 @@ from pymongo.database import Database
 
 if __name__ == '__main__':
     client=MongoClient()
-    twitter_db:Database=client['backup_twitter_messages']
-    lex_res_db:Database = client['backup_lexical_resources']
+    twitter_db:Database=client['buffer_twitter_messages']
+    lex_res_db:Database = client['buffer_lexical_resources']
 
     #inseriamo nella `backup_twitter_messages` database una collezione per ogni file txt
     emotions = ('anger','anticipation','disgust','fear','joy','sadness','surprise','trust')
