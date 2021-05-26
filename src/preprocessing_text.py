@@ -1,12 +1,30 @@
 import pprint
 import re
-from typing import Union, Iterator, Generator
+from typing import Union, Iterator, Generator, List, Tuple
 
 from emojis import emojis
 from nltk.tokenize import word_tokenize
 from pymongo import MongoClient
 from regex import regex
 
+from res.Risorse_lessicali.emoji_emoticons.emoji_emoticons import posemoticons, negemoticons
+
+
+def search_emoticons(frase: str, emoticons: List = None) -> Tuple[str,List]:
+    trovate = []
+    if emoticons is None:
+        (frase, trovate) = search_emoticons(frase,emoticons=posemoticons)
+        frase, ems2 = search_emoticons(frase,emoticons=negemoticons)
+        trovate.extend(ems2)
+    else:
+        while(len(emoticons)>0):
+            em=emoticons.pop()
+            index = frase.find(em)
+            if index!=-1:
+                trovate.append(em)
+                frase = frase.replace(em,"")
+                emoticons.append(em)
+    return frase, trovate
 
 def preprocessing_text(frase: str):
     '''
@@ -34,7 +52,8 @@ def preprocessing_text(frase: str):
     for emoji in ems:
         frase = frase.replace(emoji, "")
         list_ems.append(emoji)
-    return frase, hashtags, list_ems
+    frase, emoticons = search_emoticons(frase)
+    return frase, hashtags, list_ems, emoticons
 
 
 def upload_words(words: [str], emotion: str):
@@ -42,15 +61,17 @@ def upload_words(words: [str], emotion: str):
 
 
 if __name__ == '__main__':
-    client = MongoClient()
-    db = client['buffer_twitter_messages']
-    coll = db['anger']
-    frasi = coll.find({}).limit(15)
+    # client = MongoClient()
+    # db = client['buffer_twitter_messages']
+    # coll = db['anger']
+    # frasi = coll.find({}).limit(30)
+    frasi=[{'name':'Hi my names is Marco :)'}]
     for frase in frasi:
         print('------------prima---------------')
         pprint.pprint(frase['name'])
         print('--------------dopo-------------')
-        frase,hashtags,emoji = preprocessing_text(frase['name'])
+        frase,hashtags,emoji,emoticons = preprocessing_text(frase['name'])
         pprint.pprint(frase,indent=2)
         pprint.pprint(hashtags,indent=2)
         pprint.pprint(emoji,indent=2)
+        pprint.pprint(emoticons,indent=2)
