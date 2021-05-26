@@ -1,12 +1,17 @@
+import functools
+import json
+import os
 import pprint
 import re
-from typing import Union, Iterator, Generator, List, Tuple
+from typing import Union, Iterator, Generator, List, Tuple, Dict
 
+import nltk
 from emojis import emojis
 from nltk.tokenize import word_tokenize
 from pymongo import MongoClient
 from regex import regex
 
+from res.Risorse_lessicali.Slang_words.slang_words import slang_words
 from res.Risorse_lessicali.emoji_emoticons.emoji_emoticons import posemoticons, negemoticons
 
 
@@ -32,10 +37,10 @@ def preprocessing_text(frase: str):
     - Eliminare USERNAME e URL
     - processare gli hashtag: possiamo contarli e fare statistiche anche su quelli o possiamo buttarli
     - processare emoji ed emoticons: contarli per fare statistiche e trovare sovrapposizioni di uso tra diverse emozioni
+    - word tokenization: trovare le parole con _nltk.tokenize.word_tokenize_
     - riconoscere le forme di slang e sostituirle con le forme lunghe
     - trovare la punteggiatura e sostituirla con spazi bianchi
     - trasformare tutto a lower case
-    - word tokenization: trovare le parole con _nltk.tokenize.word_tokenize_
     - POS tagging
     - eliminare stop words
     - lemming
@@ -53,7 +58,22 @@ def preprocessing_text(frase: str):
         frase = frase.replace(emoji, "")
         list_ems.append(emoji)
     frase, emoticons = search_emoticons(frase)
-    return frase, hashtags, list_ems, emoticons
+    tokens=word_tokenize(frase)
+    print(tokens)
+    #trovare le forme di slang e sostituirle con le forme estese
+    #per ogni token
+    #   cerco se è uno slang
+    #       se lo è lo sostituisco con la forma estesa tokenizzata
+    nuovi_tokens=[]
+    for t in tokens:
+        forma_estesa=slang_words.get(t)
+        if forma_estesa is not None:
+            nuovi_tokens.extend(word_tokenize(forma_estesa))
+        else:
+            nuovi_tokens.append(t)
+
+
+    return nuovi_tokens hashtags, list_ems, emoticons
 
 
 def upload_words(words: [str], emotion: str):
@@ -65,7 +85,7 @@ if __name__ == '__main__':
     # db = client['buffer_twitter_messages']
     # coll = db['anger']
     # frasi = coll.find({}).limit(30)
-    frasi=[{'name':'Hi my names is Marco :):)'}]
+    frasi=[{'name':'hi clara, cu'}]
     for frase in frasi:
         print('------------prima---------------')
         pprint.pprint(frase['name'])

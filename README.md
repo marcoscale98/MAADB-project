@@ -9,10 +9,10 @@ Progetto d'esame per MAADB
     - Eliminare USERNAME e URL
     - processare gli hashtag: possiamo contarli e fare statistiche anche su quelli o possiamo buttarli
     - processare emoji ed emoticons: contarli per fare statistiche e trovare sovrapposizioni di uso tra diverse emozioni
-    - riconoscere le forme di slang e sostituirle con le forme lunghe
-    - trovare la punteggiatura e sostituirla con spazi bianchi
-    - trasformare tutto a lower case
     - word tokenization: trovare le parole con _nltk.tokenize.word_tokenize_
+    - riconoscere le forme di slang e sostituirle con le forme lunghe
+    - rimuovere la punteggiatura e sostituirla con spazi bianchi
+    - trasformare tutto a lower case
     - POS tagging
     - eliminare stop words
     - lemming
