@@ -73,7 +73,7 @@ def preprocessing_text(frase: str):
             nuovi_tokens.append(t)
 
 
-    return nuovi_tokens hashtags, list_ems, emoticons
+    return nuovi_tokens, hashtags, list_ems, emoticons
 
 
 def upload_words(words: [str], emotion: str):
