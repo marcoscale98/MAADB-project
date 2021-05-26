@@ -22,7 +22,7 @@ def search_emoticons(frase: str, emoticons: List = None) -> Tuple[str,List]:
             index = frase.find(em)
             if index!=-1:
                 trovate.append(em)
-                frase = frase.replace(em,"")
+                frase = frase.replace(em,"",1)
                 emoticons.append(em)
     return frase, trovate
 
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     # db = client['buffer_twitter_messages']
     # coll = db['anger']
     # frasi = coll.find({}).limit(30)
-    frasi=[{'name':'Hi my names is Marco :)'}]
+    frasi=[{'name':'Hi my names is Marco :):)'}]
     for frase in frasi:
         print('------------prima---------------')
         pprint.pprint(frase['name'])
