@@ -1,12 +1,11 @@
-import functools
-import json
-import os
 import pprint
 import re
 from typing import Union, Iterator, Generator, List, Tuple, Dict
 
 import nltk
 from emojis import emojis
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from pymongo import MongoClient
 from regex import regex
@@ -71,9 +70,20 @@ def preprocessing_text(frase: str):
             nuovi_tokens.extend(word_tokenize(forma_estesa))
         else:
             nuovi_tokens.append(t)
+    #pos tagging
+    pos_tagged = nltk.pos_tag(nuovi_tokens)
+    #remove stop words
+    without_stop_words = [t for t in pos_tagged if t[0] not in stopwords.words('english')]
+    #remove punteggiatura
+    punt = ",.-;:_'?^!\"()[]{}<>£$%&=/*+"
+    senza_punteggiatura = [t for t in without_stop_words if t[0] not in punt]
+    #lemmatizer
+    lemmatizer = WordNetLemmatizer()
+    lemmatizzato = [lemmatizer.lemmatize(t[0],pos=t[1]) for t in senza_punteggiatura] #todo non funziona
 
+    #tutto lower
 
-    return nuovi_tokens, hashtags, list_ems, emoticons
+    return frase, hashtags, list_ems, emoticons
 
 
 def upload_words(words: [str], emotion: str):
@@ -85,7 +95,7 @@ if __name__ == '__main__':
     # db = client['buffer_twitter_messages']
     # coll = db['anger']
     # frasi = coll.find({}).limit(30)
-    frasi=[{'name':'hi clara, cu'}]
+    frasi=[{'name':'hi clara, cu in the next days!'}]
     for frase in frasi:
         print('------------prima---------------')
         pprint.pprint(frase['name'])

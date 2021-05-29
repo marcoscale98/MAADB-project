@@ -4,19 +4,19 @@ Progetto d'esame per MAADB
 [Descrizione progetto](https://docs.google.com/document/d/1i3TSJpyr4vw-edKBX1XNuy52f8_Sem0aPWmo6fBpuBs/edit?ts=57308c63#heading=h.oublcismo327)
 ### Cosa c'è da creare?
 - **Database di buffer**: database dove mantenere le risorse lessicali e i messaggi di twitter (questi poi verranno recuperati come uno stream teoricamente infinito di dati)
-- Pipeline di **preprocessing** dei tweets in python (con lib. *nltk* oppure *gensim*)
-    Devo ancora capire in che ordine
-    - Eliminare USERNAME e URL
-    - processare gli hashtag: possiamo contarli e fare statistiche anche su quelli o possiamo buttarli
-    - processare emoji ed emoticons: contarli per fare statistiche e trovare sovrapposizioni di uso tra diverse emozioni
-    - word tokenization: trovare le parole con _nltk.tokenize.word_tokenize_
-    - riconoscere le forme di slang e sostituirle con le forme lunghe
-    - rimuovere la punteggiatura e sostituirla con spazi bianchi
-    - trasformare tutto a lower case
-    - POS tagging
-    - eliminare stop words
-    - lemming
-    - conteggio parole
+- Pipeline di **preprocessing** dei tweets in python (con lib. *nltk* oppure *gensim*)  
+    Devo ancora capire in che ordine  
+    - [x] Eliminare USERNAME e URL
+    - [x] processare gli hashtag: possiamo contarli e fare statistiche anche su quelli o possiamo buttarli
+    - [x] processare emoji ed emoticons: contarli per fare statistiche e trovare sovrapposizioni di uso tra diverse emozioni
+    - [x] word tokenization: trovare le parole con _nltk.tokenize.word_tokenize_
+    - [x] riconoscere le forme di slang e sostituirle con le forme lunghe
+    - [x] POS tagging
+    - [x] eliminare stop words
+    - [x] rimuovere la punteggiatura e sostituirla con spazi bianchi
+    - [ ] lemming
+    - [ ] trasformare tutto a lower case
+    - [ ] conteggio parole
     
 - **Database di analytics**: database dove mantenere le statistiche elaborate richieste:
   - parole più **frequenti** nei tweet (graficamente visualizzate con una word cloud)
