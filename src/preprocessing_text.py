@@ -45,7 +45,7 @@ def preprocessing_text(frase: str):
     - [x] trasformare tutto a lower case
 
     :param frase:
-    :return: lista di parole utili, preprocessed_text (es. {'word':'dog','lemma':'dog','pos':'NOUN'}), lista hashtag trovati, lista emoji trovate, lista emoticons trovate
+    :return: preprocessed_text (es. {'word':'dog','lemma':'dog','pos':'NOUN'}), lista hashtag trovati, lista emoji trovate, lista emoticons trovate
     '''
     frase = frase.replace("USERNAME", "").replace("URL", "")
     hashtags = re.findall(r'\B#\w*[a-zA-Z]+\w*', frase)
@@ -63,7 +63,7 @@ def preprocessing_text(frase: str):
     doc=nlp(frase)
     tokens=[]
     for token in doc:
-        print(f'{token.text} con lemma {token.lemma_} con pos: {token.pos_}')
+        # print(f'{token.text} con lemma {token.lemma_} con pos: {token.pos_}')
         tokens.append({'word':token.text,'lemma':token.lemma_,'pos':token.pos_})
     #trovare le forme di slang e sostituirle con le forme estese
     #per ogni token
@@ -75,7 +75,7 @@ def preprocessing_text(frase: str):
         if forma_estesa is not None:
             doc=nlp(forma_estesa)
             for token in doc:
-                print(f'{token.text} con lemma {token.lemma_} con pos: {token.pos_}')
+                # print(f'{token.text} con lemma {token.lemma_} con pos: {token.pos_}')
                 nuovi_tokens.append({'word': token.text, 'lemma': token.lemma_, 'pos': token.pos_})
         else:
             nuovi_tokens.append(t)
@@ -88,7 +88,7 @@ def preprocessing_text(frase: str):
     for t in senza_punteggiatura:
         t['lemma']=t['lemma'].lower()
 
-    return frase, senza_punteggiatura, hashtags, list_ems, emoticons
+    return senza_punteggiatura, hashtags, list_ems, emoticons
 
 if __name__ == '__main__':
     # client = MongoClient()

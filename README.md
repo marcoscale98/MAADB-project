@@ -51,7 +51,7 @@ Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:
 ````
 {
     _id: ObjectId(...),
-    text: str,
+    word: str,
     lemma: str,
     pos: str,
     type: <"word","emoji","emoticon","hashtag">,
