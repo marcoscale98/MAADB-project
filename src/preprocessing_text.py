@@ -94,6 +94,12 @@ def preprocessing_text(frase: str):
 def upload_words(words: [str], emotion: str):
     pass
 
+def upload_emoji(emoji,emotion):
+    pass
+def upload_emoticons(emoticons,emotion):
+    pass
+def upload_hashtags(hashtags,emotion):
+    pass
 
 if __name__ == '__main__':
     # client = MongoClient()

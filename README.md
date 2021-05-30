@@ -5,27 +5,47 @@ Python 3.9
 ## Schema di lavoro
 [Descrizione progetto](https://docs.google.com/document/d/1i3TSJpyr4vw-edKBX1XNuy52f8_Sem0aPWmo6fBpuBs/edit?ts=57308c63#heading=h.oublcismo327)
 ### Cosa c'è da creare?
-- **Database di buffer**: database dove mantenere le risorse lessicali e i messaggi di twitter (questi poi verranno recuperati come uno stream teoricamente infinito di dati)
-- Pipeline di **preprocessing** dei tweets in python (con lib. *nltk* oppure *gensim*)  
-    Devo ancora capire in che ordine  
-    - [x] Eliminare USERNAME e URL
-    - [x] processare gli hashtag: possiamo contarli e fare statistiche anche su quelli o possiamo buttarli
-    - [x] processare emoji ed emoticons: contarli per fare statistiche e trovare sovrapposizioni di uso tra diverse emozioni
-    - [x] tokenization, lemmatization and pos tagging con *spacy*
-    - [x] riconoscere le forme di slang e sostituirle con le forme lunghe
-    - [x] POS tagging
-    - [x] eliminare stop words
-    - [x] rimuovere la punteggiatura
-    - [x] trasformare tutto a lower case
-    - [ ] caricamento su db
-    
-- **Database di analytics**: database dove mantenere le statistiche elaborate richieste:
+#### Database di buffer
+ Database dove mantenere le risorse lessicali e i messaggi di twitter (questi poi verranno recuperati come uno stream teoricamente infinito di dati)
+##### Schema di *buffer_twitter_messages*
+Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:  
+````
+{
+    _id: ObjectId(...),
+    message: str,
+}
+````
+##### Schema di *buffer_lexical_resources*
+Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:  
+````
+{
+    _id: ObjectId(...),
+    text: str,
+    lemma: str,
+    pos: str,
+    type: <"word","emoji","emoticon","hashtag">,
+}
+````
+#### Pipeline di **preprocessing** dei tweets in python
+- [x] Eliminare USERNAME e URL
+- [x] processare gli hashtag: possiamo contarli e fare statistiche anche su quelli o possiamo buttarli
+- [x] processare emoji ed emoticons: contarli per fare statistiche e trovare sovrapposizioni di uso tra diverse emozioni
+- [x] tokenization, lemmatization and pos tagging con *spacy*
+- [x] riconoscere le forme di slang e sostituirle con le forme lunghe
+- [x] POS tagging
+- [x] eliminare stop words
+- [x] rimuovere la punteggiatura
+- [x] trasformare tutto a lower case
+
+#### Database di analytics
+ database dove mantenere le statistiche elaborate richieste:
   - parole più **frequenti** nei tweet (graficamente visualizzate con una word cloud)
   - emoji più frequenti nei tweet (graficamente visualizzate con una word cloud)
   - emoticons più frequenti nei tweet (graficamente visualizzate con una word cloud)
   - per ciascun sentimento (X e Y sono sentimenti), la percentuale delle parole delle risorse lessicali presenti nei tweets: _perc_persence_lex_words(X,Y)_ (visualizzarle con un istogramma)
   - raccogliere le parole nuove presenti nei tweets ma non nelle risorse lessicali (_N_twittter_words(Y)- N_shared_words(X,Y)_)
-- **eventualmente nuova risorsa su DB**: Memorizzare le _nuove parole_ trovate nei tweet ma assenti nelle risorse fornite (se alla fine del conteggio saranno altamente presenti avremo trovato nuova parole da aggiungere alle risorse o avremo creato una risorsa  aggiuntiva!)
+#### eventualmente nuova risorsa su DB
+ Memorizzare le _nuove parole_ trovate nei tweet ma assenti nelle risorse fornite (se alla fine del conteggio saranno altamente presenti avremo trovato nuova parole da aggiungere alle risorse o avremo creato una risorsa  aggiuntiva!)
 ![image](https://user-images.githubusercontent.com/43850400/118098215-ea947000-b3d3-11eb-9a94-4d41571c25f8.png)
 
 ## Osservazioni su Risorse messaggi Twitter
