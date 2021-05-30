@@ -3,6 +3,7 @@ import re
 from typing import Union, Iterator, Generator, List, Tuple, Dict
 
 import nltk
+import spacy
 from emojis import emojis
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
@@ -57,31 +58,36 @@ def preprocessing_text(frase: str):
         frase = frase.replace(emoji, "")
         list_ems.append(emoji)
     frase, emoticons = search_emoticons(frase)
-    tokens=word_tokenize(frase)
-    print(tokens)
+
+    nlp=spacy.load('en_core_web_sm')
+    #tokenization, lemmatization and pos tagging
+    doc=nlp(frase)
+    tokens=[]
+    for token in doc:
+        print(f'{token.text} con lemma {token.lemma_} con pos: {token.pos_}')
+        tokens.append({'word':token.text,'lemma':token.lemma_,'pos':token.pos_})
     #trovare le forme di slang e sostituirle con le forme estese
     #per ogni token
     #   cerco se è uno slang
     #       se lo è lo sostituisco con la forma estesa tokenizzata
     nuovi_tokens=[]
     for t in tokens:
-        forma_estesa=slang_words.get(t)
+        forma_estesa=slang_words.get(t['word'])
         if forma_estesa is not None:
-            nuovi_tokens.extend(word_tokenize(forma_estesa))
+            doc=nlp(forma_estesa)
+            for token in doc:
+                print(f'{token.text} con lemma {token.lemma_} con pos: {token.pos_}')
+                nuovi_tokens.append({'word': token.text, 'lemma': token.lemma_, 'pos': token.pos_})
         else:
             nuovi_tokens.append(t)
-    #pos tagging
-    pos_tagged = nltk.pos_tag(nuovi_tokens)
     #remove stop words
-    without_stop_words = [t for t in pos_tagged if t[0] not in stopwords.words('english')]
+    without_stop_words = [t for t in nuovi_tokens if t['word'] not in stopwords.words('english')]
     #remove punteggiatura
     punt = ",.-;:_'?^!\"()[]{}<>£$%&=/*+"
-    senza_punteggiatura = [t for t in without_stop_words if t[0] not in punt]
-    #lemmatizer
-    lemmatizer = WordNetLemmatizer()
-    lemmatizzato = [lemmatizer.lemmatize(t[0],pos=t[1]) for t in senza_punteggiatura] #todo non funziona
-
+    senza_punteggiatura = [t for t in without_stop_words if t['word'] not in punt]
     #tutto lower
+    for t in senza_punteggiatura:
+        t['lemma']=t['lemma'].lower()
 
     return frase, hashtags, list_ems, emoticons
 
@@ -95,7 +101,7 @@ if __name__ == '__main__':
     # db = client['buffer_twitter_messages']
     # coll = db['anger']
     # frasi = coll.find({}).limit(30)
-    frasi=[{'name':'hi clara, cu in the next days!'}]
+    frasi=[{'name':'Pen is on the table!'}]
     for frase in frasi:
         print('------------prima---------------')
         pprint.pprint(frase['name'])

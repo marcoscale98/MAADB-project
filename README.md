@@ -1,5 +1,7 @@
 # MAADB-project
 Progetto d'esame per MAADB
+## Versione di Python
+Python 3.9
 ## Schema di lavoro
 [Descrizione progetto](https://docs.google.com/document/d/1i3TSJpyr4vw-edKBX1XNuy52f8_Sem0aPWmo6fBpuBs/edit?ts=57308c63#heading=h.oublcismo327)
 ### Cosa c'è da creare?
@@ -9,14 +11,14 @@ Progetto d'esame per MAADB
     - [x] Eliminare USERNAME e URL
     - [x] processare gli hashtag: possiamo contarli e fare statistiche anche su quelli o possiamo buttarli
     - [x] processare emoji ed emoticons: contarli per fare statistiche e trovare sovrapposizioni di uso tra diverse emozioni
-    - [x] word tokenization: trovare le parole con _nltk.tokenize.word_tokenize_
+    - [x] tokenization, lemmatization and pos tagging con *spacy*
     - [x] riconoscere le forme di slang e sostituirle con le forme lunghe
     - [x] POS tagging
     - [x] eliminare stop words
-    - [x] rimuovere la punteggiatura e sostituirla con spazi bianchi
-    - [ ] lemming
-    - [ ] trasformare tutto a lower case
-    - [ ] conteggio parole
+    - [x] rimuovere la punteggiatura
+    - [x] lemming
+    - [x] trasformare tutto a lower case
+    - [ ] caricamento su db
     
 - **Database di analytics**: database dove mantenere le statistiche elaborate richieste:
   - parole più **frequenti** nei tweet (graficamente visualizzate con una word cloud)
