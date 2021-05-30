@@ -46,6 +46,19 @@ def populate_db_lexres():
         print(f'n. documenti presenti nella collezione {emot_coll.name}: {emot_coll.count_documents({})}')
 
 
+def upload_words(words: [str], emotion: str):
+    client = MongoClient()
+    lex_res_db: Database = client['twitter_words']
+    emot_coll: Collection = lex_res_db[emotion]
+
+
+def upload_emoji(emoji,emotion):
+    pass
+def upload_emoticons(emoticons,emotion):
+    pass
+def upload_hashtags(hashtags,emotion):
+    pass
+
 def populate_db_twitter():
     # inseriamo nella `backup_twitter_messages` database una collezione per ogni file txt
     for em in emotions:

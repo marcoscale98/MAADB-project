@@ -20,10 +20,12 @@ Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:
 ````
 {
     _id: ObjectId(...),
-    text: str,
-    lemma: str,
-    pos: str,
-    type: <"word","emoji","emoticon","hashtag">,
+    lemma:str,
+    res: {
+        EmoSN: Optional[int],
+        NRC: Optional[int],
+        sentisense: Optional[int],
+    }
 }
 ````
 #### Pipeline di **preprocessing** dei tweets in python
@@ -44,6 +46,17 @@ Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:
   - emoticons più frequenti nei tweet (graficamente visualizzate con una word cloud)
   - per ciascun sentimento (X e Y sono sentimenti), la percentuale delle parole delle risorse lessicali presenti nei tweets: _perc_persence_lex_words(X,Y)_ (visualizzarle con un istogramma)
   - raccogliere le parole nuove presenti nei tweets ma non nelle risorse lessicali (_N_twittter_words(Y)- N_shared_words(X,Y)_)
+##### Schema di *twitter_words*
+Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:  
+````
+{
+    _id: ObjectId(...),
+    text: str,
+    lemma: str,
+    pos: str,
+    type: <"word","emoji","emoticon","hashtag">,
+}
+````
 #### eventualmente nuova risorsa su DB
  Memorizzare le _nuove parole_ trovate nei tweet ma assenti nelle risorse fornite (se alla fine del conteggio saranno altamente presenti avremo trovato nuova parole da aggiungere alle risorse o avremo creato una risorsa  aggiuntiva!)
 ![image](https://user-images.githubusercontent.com/43850400/118098215-ea947000-b3d3-11eb-9a94-4d41571c25f8.png)
