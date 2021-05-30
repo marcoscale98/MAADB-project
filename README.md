@@ -16,7 +16,6 @@ Python 3.9
     - [x] POS tagging
     - [x] eliminare stop words
     - [x] rimuovere la punteggiatura
-    - [x] lemming
     - [x] trasformare tutto a lower case
     - [ ] caricamento su db
     

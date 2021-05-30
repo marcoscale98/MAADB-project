@@ -34,19 +34,18 @@ def search_emoticons(frase: str, emoticons: List = None) -> Tuple[str,List]:
 def preprocessing_text(frase: str):
     '''
     Serie di operazioni svolte:
-    - Eliminare USERNAME e URL
-    - processare gli hashtag: possiamo contarli e fare statistiche anche su quelli o possiamo buttarli
-    - processare emoji ed emoticons: contarli per fare statistiche e trovare sovrapposizioni di uso tra diverse emozioni
-    - word tokenization: trovare le parole con _nltk.tokenize.word_tokenize_
-    - riconoscere le forme di slang e sostituirle con le forme lunghe
-    - trovare la punteggiatura e sostituirla con spazi bianchi
-    - trasformare tutto a lower case
-    - POS tagging
-    - eliminare stop words
-    - lemming
+    - [x] Eliminare USERNAME e URL
+    - [x] processare gli hashtag: possiamo contarli e fare statistiche anche su quelli o possiamo buttarli
+    - [x] processare emoji ed emoticons: contarli per fare statistiche e trovare sovrapposizioni di uso tra diverse emozioni
+    - [x] tokenization, lemmatization and pos tagging con *spacy*
+    - [x] riconoscere le forme di slang e sostituirle con le forme lunghe
+    - [x] POS tagging
+    - [x] eliminare stop words
+    - [x] rimuovere la punteggiatura
+    - [x] trasformare tutto a lower case
 
     :param frase:
-    :return: lista di parole utili, lista hashtag trovati, lista emoji trovate, lista emoticons trovate
+    :return: lista di parole utili, preprocessed_text (es. {'word':'dog','lemma':'dog','pos':'NOUN'}), lista hashtag trovati, lista emoji trovate, lista emoticons trovate
     '''
     frase = frase.replace("USERNAME", "").replace("URL", "")
     hashtags = re.findall(r'\B#\w*[a-zA-Z]+\w*', frase)
@@ -89,7 +88,7 @@ def preprocessing_text(frase: str):
     for t in senza_punteggiatura:
         t['lemma']=t['lemma'].lower()
 
-    return frase, hashtags, list_ems, emoticons
+    return frase, senza_punteggiatura, hashtags, list_ems, emoticons
 
 
 def upload_words(words: [str], emotion: str):
@@ -106,8 +105,9 @@ if __name__ == '__main__':
         print('------------prima---------------')
         pprint.pprint(frase['name'])
         print('--------------dopo-------------')
-        frase,hashtags,emoji,emoticons = preprocessing_text(frase['name'])
-        pprint.pprint(frase,indent=2)
-        pprint.pprint(hashtags,indent=2)
-        pprint.pprint(emoji,indent=2)
-        pprint.pprint(emoticons,indent=2)
+        frase, preprocessed_text, hashtags,emoji,emoticons = preprocessing_text(frase['name'])
+        pprint.pprint(f'frase:{frase}',indent=2)
+        pprint.pprint(f'preprocessed_text: {preprocessed_text}',indent=2)
+        pprint.pprint(f'hashtags: {hashtags}',indent=2)
+        pprint.pprint(f'emoji: {emoji}',indent=2)
+        pprint.pprint(f'emoticons: {emoticons}',indent=2)
