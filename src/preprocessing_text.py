@@ -15,21 +15,22 @@ from res.Risorse_lessicali.Slang_words.slang_words import slang_words
 from res.Risorse_lessicali.emoji_emoticons.emoji_emoticons import posemoticons, negemoticons
 
 
-def search_emoticons(frase: str, emoticons: List = None) -> Tuple[str,List]:
+def search_emoticons(frase: str, emoticons: List = None) -> Tuple[str, List]:
     trovate = []
     if emoticons is None:
-        (frase, trovate) = search_emoticons(frase,emoticons=posemoticons)
-        frase, ems2 = search_emoticons(frase,emoticons=negemoticons)
+        (frase, trovate) = search_emoticons(frase, emoticons=posemoticons)
+        frase, ems2 = search_emoticons(frase, emoticons=negemoticons)
         trovate.extend(ems2)
     else:
-        while(len(emoticons)>0):
-            em=emoticons.pop()
+        while (len(emoticons) > 0):
+            em = emoticons.pop()
             index = frase.find(em)
-            if index!=-1:
+            if index != -1:
                 trovate.append(em)
-                frase = frase.replace(em,"",1)
+                frase = frase.replace(em, "", 1)
                 emoticons.append(em)
     return frase, trovate
+
 
 def preprocessing_text(frase: str):
     '''
@@ -39,7 +40,6 @@ def preprocessing_text(frase: str):
     - [x] processare emoji ed emoticons: contarli per fare statistiche e trovare sovrapposizioni di uso tra diverse emozioni
     - [x] tokenization, lemmatization and pos tagging con *spacy*
     - [x] riconoscere le forme di slang e sostituirle con le forme lunghe
-    - [x] POS tagging
     - [x] eliminare stop words
     - [x] rimuovere la punteggiatura
     - [x] trasformare tutto a lower case
@@ -51,58 +51,61 @@ def preprocessing_text(frase: str):
     hashtags = re.findall(r'\B#\w*[a-zA-Z]+\w*', frase)
     for h in hashtags:
         frase = frase.replace(h, "", 1)
-    ems:Generator= emojis.iter(frase) #in questo modo conta prende anche le ripetizioni
-    list_ems=[]
+    ems: Generator = emojis.iter(frase)  # in questo modo conta prende anche le ripetizioni
+    list_ems = []
     for emoji in ems:
         frase = frase.replace(emoji, "")
         list_ems.append(emoji)
     frase, emoticons = search_emoticons(frase)
 
-    nlp=spacy.load('en_core_web_sm')
-    #tokenization, lemmatization and pos tagging
-    doc=nlp(frase)
-    tokens=[]
+    nlp = spacy.load('en_core_web_sm')
+    # tokenization, lemmatization and pos tagging
+    doc = nlp(frase)
+    tokens = []
     for token in doc:
         # print(f'{token.text} con lemma {token.lemma_} con pos: {token.pos_}')
-        tokens.append({'word':token.text,'lemma':token.lemma_,'pos':token.pos_})
-    #trovare le forme di slang e sostituirle con le forme estese
-    #per ogni token
+        tokens.append({'word': token.text, 'lemma': token.lemma_, 'pos': token.pos_})
+    # trovare le forme di slang e sostituirle con le forme estese
+    # per ogni token
     #   cerco se è uno slang
     #       se lo è lo sostituisco con la forma estesa tokenizzata
-    nuovi_tokens=[]
+    nuovi_tokens = []
     for t in tokens:
-        forma_estesa=slang_words.get(t['word'])
+        forma_estesa = slang_words.get(t['word'])
         if forma_estesa is not None:
-            doc=nlp(forma_estesa)
+            doc = nlp(forma_estesa)
             for token in doc:
                 # print(f'{token.text} con lemma {token.lemma_} con pos: {token.pos_}')
                 nuovi_tokens.append({'word': token.text, 'lemma': token.lemma_, 'pos': token.pos_})
         else:
             nuovi_tokens.append(t)
-    #remove stop words
+    #per sapere quali tipi di pos ci sono
+        poss= set()
+        poss.add(t['pos'])
+    # remove stop words
     without_stop_words = [t for t in nuovi_tokens if t['word'] not in stopwords.words('english')]
-    #remove punteggiatura
-    punt = ",.-;:_'?^!\"()[]{}<>£$%&=/*+"
-    senza_punteggiatura = [t for t in without_stop_words if t['word'] not in punt]
-    #tutto lower
+    # remove punteggiatura, parole mal formate e eventuali caratteri speciali
+    senza_punteggiatura = [t for t in without_stop_words if t['pos'] not in {'SPACE','SYM','PUNCT','X'}]
+    print(list(map(lambda t: t['pos'], senza_punteggiatura)))
+    # tutto lower
     for t in senza_punteggiatura:
-        t['lemma']=t['lemma'].lower()
-
+        t['lemma'] = t['lemma'].lower()
     return senza_punteggiatura, hashtags, list_ems, emoticons
+
 
 if __name__ == '__main__':
     # client = MongoClient()
     # db = client['buffer_twitter_messages']
     # coll = db['anger']
     # frasi = coll.find({}).limit(30)
-    frasi=[{'name':'Pen is on the table!'}]
+    frasi = [{'name': 'Pen is on the table!'}]
     for frase in frasi:
         print('------------prima---------------')
         pprint.pprint(frase['name'])
         print('--------------dopo-------------')
-        frase, preprocessed_text, hashtags,emoji,emoticons = preprocessing_text(frase['name'])
-        pprint.pprint(f'frase:{frase}',indent=2)
-        pprint.pprint(f'preprocessed_text: {preprocessed_text}',indent=2)
-        pprint.pprint(f'hashtags: {hashtags}',indent=2)
-        pprint.pprint(f'emoji: {emoji}',indent=2)
-        pprint.pprint(f'emoticons: {emoticons}',indent=2)
+        frase, preprocessed_text, hashtags, emoji, emoticons = preprocessing_text(frase['name'])
+        pprint.pprint(f'frase:{frase}', indent=2)
+        pprint.pprint(f'preprocessed_text: {preprocessed_text}', indent=2)
+        pprint.pprint(f'hashtags: {hashtags}', indent=2)
+        pprint.pprint(f'emoji: {emoji}', indent=2)
+        pprint.pprint(f'emoticons: {emoticons}', indent=2)
