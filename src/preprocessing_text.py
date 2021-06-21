@@ -1,5 +1,3 @@
-#ci mette 471 ms per 30 tweet
-#ci mette 15150 ms per 30 tweet
 import pprint
 import re
 from typing import Union, Iterator, Generator, List, Tuple, Dict
@@ -136,6 +134,8 @@ def replace_username_url(frase):
 
 if __name__ == '__main__':
     nlp = spacy.load('en_core_web_sm', disable=['ner'])
+    nlp.disable_pipe("parser")
+    nlp.enable_pipe("senter")
     print(nlp.pipe_names)
 
     client = MongoClient()
