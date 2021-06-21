@@ -6,6 +6,8 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
 
+from impostazioni import *
+
 emotions = ('anger', 'anticipation', 'disgust', 'fear', 'joy', 'sadness', 'surprise', 'trust')
 
 
@@ -56,7 +58,8 @@ def upload_words(words: [str], emotion: str, type: str = 'word'):
 
     words = list(map(lambda word: add_type(word,type), words))
     result = emot_coll[emotion].insert_many(words)
-    print(f'Inseriti {len(result.inserted_ids)} {type} in {lex_res_db.name}.{emot_coll.name}')
+    if DEBUG:
+        print(f'Inseriti {len(result.inserted_ids)} {type} in {lex_res_db.name}.{emot_coll.name}')
 
 
 def add_type(word, tipo):

@@ -1,3 +1,5 @@
+#ci mette 471 ms per 30 tweet
+#ci mette 15150 ms per 30 tweet
 import pprint
 import re
 from typing import Union, Iterator, Generator, List, Tuple, Dict
@@ -10,11 +12,11 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from pymongo import MongoClient
 from regex import regex
+from impostazioni import *
+
 
 from res.Risorse_lessicali.Slang_words.slang_words import slang_words
 from res.Risorse_lessicali.emoji_emoticons.emoji_emoticons import posemoticons, negemoticons
-
-
 def search_emoticons(frase: str, emoticons: List = None) -> Tuple[str, List]:
     trovate = []
     if emoticons is None:
@@ -31,8 +33,7 @@ def search_emoticons(frase: str, emoticons: List = None) -> Tuple[str, List]:
                 emoticons.append(em)
     return frase, trovate
 
-
-def preprocessing_text(frase: str):
+def preprocessing_text(frasi: Generator) -> dict[int, dict[str, Union[int, str, list, list]]]:
     '''
     Serie di operazioni svolte:
     - [x] Eliminare USERNAME e URL
@@ -47,24 +48,40 @@ def preprocessing_text(frase: str):
     :param frase:
     :return: preprocessed_text (es. {'word':'dog','lemma':'dog','pos':'NOUN'}), lista hashtag trovati, lista emoji trovate, lista emoticons trovate
     '''
-    frase = frase.replace("USERNAME", "").replace("URL", "")
-    hashtags = re.findall(r'\B#\w*[a-zA-Z]+\w*', frase)
-    for h in hashtags:
-        frase = frase.replace(h, "", 1)
-    ems: Generator = emojis.iter(frase)  # in questo modo conta prende anche le ripetizioni
-    list_ems = []
-    for emoji in ems:
-        frase = frase.replace(emoji, "")
-        list_ems.append(emoji)
-    frase, emoticons = search_emoticons(frase)
+    tweets_analizzati= dict()
+    i=0
+    for frase in frasi:
+        emoticons, frase, hashtags, list_emojis = primo_processing(frase)
+        tweets_analizzati[i]={"id":i, "frase_ripulita": frase,"hashtags":hashtags,"emoticons":emoticons,"emojis":list_emojis}
+        i+=1
 
-    nlp = spacy.load('en_core_web_sm')
-    # tokenization, lemmatization and pos tagging
-    doc = nlp(frase)
-    tokens = []
-    for token in doc:
-        # print(f'{token.text} con lemma {token.lemma_} con pos: {token.pos_}')
-        tokens.append({'word': token.text, 'lemma': token.lemma_, 'pos': token.pos_})
+    frasi_tokenizzate:Generator = spacy_processing((tweet["frase_ripulita"] for tweet in tweets_analizzati.values()))
+    i=0
+    for list_token in frasi_tokenizzate:
+        parole_senza_punteggiatura = secondo_processing(list_token)
+        tweets_analizzati[i]["parole"] = parole_senza_punteggiatura
+        i+=1
+    return tweets_analizzati
+
+def secondo_processing(list_token):
+    nuovi_tokens = slang_words_processing(list_token)
+    # remove stop words
+    without_stop_words = [t for t in nuovi_tokens if t['word'] not in stopwords.words('english')]
+    # remuove punteggiatura, parole mal formate e eventuali caratteri speciali
+    parole_senza_punteggiatura = [t for t in without_stop_words if t['pos'] not in {'SPACE', 'SYM', 'PUNCT', 'X'}]
+    # tutto lower
+    for t in parole_senza_punteggiatura:
+        t['lemma'] = t['lemma'].lower()
+    return parole_senza_punteggiatura
+
+def primo_processing(frase):
+    frase = replace_username_url(frase)
+    frase, hashtags = extract_hashtags(frase)
+    frase, list_ems = extract_emoji(frase)
+    frase, emoticons = search_emoticons(frase)
+    return emoticons, frase, hashtags, list_ems
+
+def slang_words_processing(tokens):
     # trovare le forme di slang e sostituirle con le forme estese
     # per ogni token
     #   cerco se è uno slang
@@ -79,33 +96,70 @@ def preprocessing_text(frase: str):
                 nuovi_tokens.append({'word': token.text, 'lemma': token.lemma_, 'pos': token.pos_})
         else:
             nuovi_tokens.append(t)
-    #per sapere quali tipi di pos ci sono
-        poss= set()
-        poss.add(t['pos'])
-    # remove stop words
-    without_stop_words = [t for t in nuovi_tokens if t['word'] not in stopwords.words('english')]
-    # remove punteggiatura, parole mal formate e eventuali caratteri speciali
-    senza_punteggiatura = [t for t in without_stop_words if t['pos'] not in {'SPACE','SYM','PUNCT','X'}]
-    print(list(map(lambda t: t['pos'], senza_punteggiatura)))
-    # tutto lower
-    for t in senza_punteggiatura:
-        t['lemma'] = t['lemma'].lower()
-    return senza_punteggiatura, hashtags, list_ems, emoticons
+    return nuovi_tokens
 
+def spacy_processing(frasi: Generator) -> Generator:
+    # tokenization, lemmatization and pos tagging
+    docs = nlp.pipe(frasi,n_process=8)
+
+    def extract_token(doc):
+        tokens = []
+        for token in doc:
+            # print(f'{token.text} con lemma {token.lemma_} con pos: {token.pos_}')
+            tokens.append({'word': token.text, 'lemma': token.lemma_, 'pos': token.pos_})
+        return tokens
+    frasi_processate = (extract_token(doc) for doc in docs)
+    return frasi_processate
+
+def extract_emoji(frase):
+    '''
+
+    :param frase: frase dove trovare le emoji
+    :return:
+    '''
+    list_ems = []
+    ems: Generator = emojis.iter(frase)  # in questo modo conta prende anche le ripetizioni
+    for emoji in ems:
+        frase = frase.replace(emoji, "")
+        list_ems.append(emoji)
+    return frase, list_ems
+
+def extract_hashtags(frase):
+    hashtags = re.findall(r'\B#\w*[a-zA-Z]+\w*', frase)
+    for h in hashtags:
+        frase = frase.replace(h, "", 1)
+    return frase, hashtags
+
+def replace_username_url(frase):
+    frase = frase.replace("USERNAME", "").replace("URL", "")
+    return frase
 
 if __name__ == '__main__':
-    # client = MongoClient()
-    # db = client['buffer_twitter_messages']
-    # coll = db['anger']
-    # frasi = coll.find({}).limit(30)
-    frasi = [{'name': 'Pen is on the table!'}]
-    for frase in frasi:
+    nlp = spacy.load('en_core_web_sm', disable=['ner'])
+    print(nlp.pipe_names)
+
+    client = MongoClient()
+    db = client['buffer_twitter_messages']
+    coll = db['anger']
+    frasi = coll.find({}).limit(30)
+    frasi = (frase['message'] for frase in frasi)
+    # frasi = [{'message': 'Pen is on the table!'}]
+    frasi = list(frasi)
+    tweet_analizzati = preprocessing_text(frasi)
+    i=0
+    for analizzati in tweet_analizzati.values():
         print('------------prima---------------')
-        pprint.pprint(frase['name'])
+        pprint.pprint(frasi[i])
+        i+=1
         print('--------------dopo-------------')
-        frase, preprocessed_text, hashtags, emoji, emoticons = preprocessing_text(frase['name'])
-        pprint.pprint(f'frase:{frase}', indent=2)
-        pprint.pprint(f'preprocessed_text: {preprocessed_text}', indent=2)
-        pprint.pprint(f'hashtags: {hashtags}', indent=2)
-        pprint.pprint(f'emoji: {emoji}', indent=2)
-        pprint.pprint(f'emoticons: {emoticons}', indent=2)
+        print("frase")
+        pprint.pprint(analizzati["frase_ripulita"], indent=2)
+        print("hashtags")
+        pprint.pprint(analizzati["hashtags"], indent=2)
+        print("emoji")
+        pprint.pprint(analizzati["emojis"], indent=2)
+        print("emoticons")
+        pprint.pprint(analizzati["emoticons"], indent=2)
+        print("parole")
+        pprint.pprint(analizzati["parole"], indent=2)
+
