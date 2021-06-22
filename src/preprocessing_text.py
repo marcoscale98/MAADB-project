@@ -142,24 +142,25 @@ if __name__ == '__main__':
     db = client['buffer_twitter_messages']
     coll = db['anger']
     frasi = coll.find({}).limit(30)
-    frasi = (frase['message'] for frase in frasi)
+    frasi: Generator = (frase['message'] for frase in frasi)
     # frasi = [{'message': 'Pen is on the table!'}]
-    frasi = list(frasi)
     tweet_analizzati = preprocessing_text(frasi)
     i=0
     for analizzati in tweet_analizzati.values():
-        print('------------prima---------------')
-        pprint.pprint(frasi[i])
+
         i+=1
-        print('--------------dopo-------------')
-        print("frase")
-        pprint.pprint(analizzati["frase_ripulita"], indent=2)
-        print("hashtags")
-        pprint.pprint(analizzati["hashtags"], indent=2)
-        print("emoji")
-        pprint.pprint(analizzati["emojis"], indent=2)
-        print("emoticons")
-        pprint.pprint(analizzati["emoticons"], indent=2)
-        print("parole")
-        pprint.pprint(analizzati["parole"], indent=2)
+        if DEBUG:
+            # print(f'--------------{i}-------------')
+            # print("frase")
+            # pprint.pprint(analizzati["frase_ripulita"], indent=2)
+            # print("hashtags")
+            # pprint.pprint(analizzati["hashtags"], indent=2)
+            # print("emoji")
+            # pprint.pprint(analizzati["emojis"], indent=2)
+            # print("emoticons")
+            # pprint.pprint(analizzati["emoticons"], indent=2)
+            # print("parole")
+            # pprint.pprint(analizzati["parole"], indent=2)
+            if i%1000:
+                print(f'Analizzati {i} tweet')
 
