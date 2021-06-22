@@ -12,3 +12,9 @@ Convertire liste in set e dizionari nel preprocessing
 18145 ms per 30 tweet
 ### con pipe spacy ottimization
 15150 ms per 30 tweet
+### più si aumentano i tweet e meno la faccenda è drammatica
+ 37473 ms per 3000 tweet
+458000 ms per 60000 tweets
+
+##ottimizzazione upload_words
+2869 secondi per 60000 tweets
