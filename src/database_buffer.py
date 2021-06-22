@@ -65,7 +65,7 @@ def upload_words(words: [str], emotion: str, type: str = 'word'):
 def add_type(word, tipo):
     if type(word)==str:
         word= {
-            'word':word,
+            'token':word,
             'type':tipo,
         }
     else:

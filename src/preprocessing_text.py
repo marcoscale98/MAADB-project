@@ -15,6 +15,9 @@ from impostazioni import *
 
 from res.Risorse_lessicali.Slang_words.slang_words import slang_words
 from res.Risorse_lessicali.emoji_emoticons.emoji_emoticons import posemoticons, negemoticons
+from src.database_buffer import upload_words
+
+
 def search_emoticons(frase: str) -> Tuple[str, List]:
     trovate = []
     emoticons = posemoticons.union(negemoticons)
@@ -144,28 +147,19 @@ if __name__ == '__main__':
     i=0
     valori = tweet_analizzati.values()
     hashtags = [el['hashtags'] for el in valori]
+    upload_words(hashtags, 'anger', type='hashtag')
+    if DEBUG:
+        print(f'Caricati hashtags')
     emojis = [el['emojis'] for el in valori]
+    upload_words(emojis, 'anger', type='emoji')
+    if DEBUG:
+        print(f'Caricati emojis')
     tokens = [el['parole'] for el in valori]
+    upload_words(tokens, 'anger', type='word')
+    if DEBUG:
+        print(f'Caricati tokens')
     emoticons = [el['emoticons'] for el in valori]
-    for analizzati in tweet_analizzati.values():
-
-        # upload_words(em, 'anger', type='emoticon')
-        # upload_words(em, 'anger', type='emoji')
-        # upload_words(h, 'anger', type='hashtag')
-        # upload_words(parola, 'anger', type='word')
-        i+=1
-        if DEBUG:
-            # print(f'--------------{i}-------------')
-            # print("frase")
-            # pprint.pprint(analizzati["frase_ripulita"], indent=2)
-            # print("hashtags")
-            # pprint.pprint(analizzati["hashtags"], indent=2)
-            # print("emoji")
-            # pprint.pprint(analizzati["emojis"], indent=2)
-            # print("emoticons")
-            # pprint.pprint(analizzati["emoticons"], indent=2)
-            # print("parole")
-            # pprint.pprint(analizzati["parole"], indent=2)
-            if i%1000:
-                print(f'Analizzati {i} tweet')
+    upload_words(emoticons, 'anger', type='emoticon')
+    if DEBUG:
+        print(f'Caricati emoticons')
 
