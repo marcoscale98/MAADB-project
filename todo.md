@@ -16,5 +16,9 @@ Convertire liste in set e dizionari nel preprocessing
  37473 ms per 3000 tweet
 458000 ms per 60000 tweets
 
-##ottimizzazione upload_words
+## ottimizzazione upload_words
 2869 secondi per 60000 tweets
+
+## con ottimizzazione di upload_words
+473 s per 60000 tweets
+11 s per 60000 tweets

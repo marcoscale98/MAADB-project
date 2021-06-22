@@ -141,28 +141,24 @@ if __name__ == '__main__':
     db = client['buffer_twitter_messages']
     coll = db['anger']
     db_tokens = client['twitter_words'].drop_collection("anger")
-    frasi = coll.find({}).limit(30)
+    frasi = coll.find({}).limit(60000)
     frasi: Generator = (frase['message'] for frase in frasi)
     # frasi = [{'message': 'Pen is on the table!'}]
     tweet_analizzati = preprocessing_text(frasi)
-
+    print("Finito preprocessing")
     lista = tweet_analizzati.values()
     hashtags = [ogg for sotto_lista in lista for ogg in sotto_lista['hashtags']]
     upload_words(hashtags, 'anger', type='hashtag')
-    if DEBUG:
-        print(f'Caricati hashtags')
+    print(f'Caricati hashtags')
     emojis = [ogg for sotto_lista in lista for ogg in sotto_lista['emojis']]
     upload_words(emojis, 'anger', type='emoji')
-    if DEBUG:
-        print(f'Caricati emojis')
+    print(f'Caricati emojis')
     tokens = [ogg for sotto_lista in lista for ogg in sotto_lista['parole']]
     upload_words(tokens, 'anger', type='word')
-    if DEBUG:
-        print(f'Caricati tokens')
+    print(f'Caricati tokens')
     emoticons = [ogg for sotto_lista in lista for ogg in sotto_lista['emoticons']]
     upload_words(emoticons, 'anger', type='emoticon')
-    if DEBUG:
-        print(f'Caricati emoticons')
+    print(f'Caricati emoticons')
     if DEBUG:
         pprint.pprint(hashtags)
         pprint.pp(emoticons)
