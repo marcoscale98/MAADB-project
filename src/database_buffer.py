@@ -1,5 +1,6 @@
 import os
 from pprint import pprint
+from typing import Union
 
 import pymongo
 from pymongo import MongoClient
@@ -49,7 +50,7 @@ def populate_db_lexres():
         print(f'n. documenti presenti nella collezione {emot_coll.name}: {emot_coll.count_documents({})}')
 
 
-def upload_words(words: [str], emotion: str, type: str = 'word'):
+def upload_words(words: list[Union[str,dict]], emotion: str, type: str = 'word'):
     client = MongoClient()
     lex_res_db: Database = client['twitter_words']
     emot_coll: Collection = lex_res_db[emotion]

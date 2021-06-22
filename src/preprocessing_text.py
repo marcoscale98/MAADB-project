@@ -50,9 +50,10 @@ def preprocessing_text(frasi: Generator) -> dict[int, dict[str, Union[int, str, 
     for frase in frasi:
         emoticons, frase, hashtags, list_emojis = primo_processing(frase)
         tweets_analizzati[i]={"id":i, "frase_ripulita": frase,"hashtags":hashtags,"emoticons":emoticons,"emojis":list_emojis}
+
         i+=1
 
-    frasi_tokenizzate:Generator = spacy_processing((tweet["frase_ripulita"] for tweet in tweets_analizzati.values()))
+    frasi_tokenizzate:Generator = spacy_processing((tweet["frase_ripulita"] for tweet in tweets_analizzati.values())) ##parte più costosa
     i=0
     for list_token in frasi_tokenizzate:
         parole_senza_punteggiatura = secondo_processing(list_token)
@@ -102,7 +103,6 @@ def spacy_processing(frasi: Generator) -> Generator:
     def extract_token(doc):
         tokens = []
         for token in doc:
-            # print(f'{token.text} con lemma {token.lemma_} con pos: {token.pos_}')
             tokens.append({'word': token.text, 'lemma': token.lemma_, 'pos': token.pos_})
         return tokens
     frasi_processate = (extract_token(doc) for doc in docs)
@@ -140,26 +140,32 @@ if __name__ == '__main__':
     client = MongoClient()
     db = client['buffer_twitter_messages']
     coll = db['anger']
+    db_tokens = client['twitter_words'].drop_collection("anger")
     frasi = coll.find({}).limit(30)
     frasi: Generator = (frase['message'] for frase in frasi)
     # frasi = [{'message': 'Pen is on the table!'}]
     tweet_analizzati = preprocessing_text(frasi)
-    i=0
-    valori = tweet_analizzati.values()
-    hashtags = [el['hashtags'] for el in valori]
+
+    lista = tweet_analizzati.values()
+    hashtags = [ogg for sotto_lista in lista for ogg in sotto_lista['hashtags']]
     upload_words(hashtags, 'anger', type='hashtag')
     if DEBUG:
         print(f'Caricati hashtags')
-    emojis = [el['emojis'] for el in valori]
+    emojis = [ogg for sotto_lista in lista for ogg in sotto_lista['emojis']]
     upload_words(emojis, 'anger', type='emoji')
     if DEBUG:
         print(f'Caricati emojis')
-    tokens = [el['parole'] for el in valori]
+    tokens = [ogg for sotto_lista in lista for ogg in sotto_lista['parole']]
     upload_words(tokens, 'anger', type='word')
     if DEBUG:
         print(f'Caricati tokens')
-    emoticons = [el['emoticons'] for el in valori]
+    emoticons = [ogg for sotto_lista in lista for ogg in sotto_lista['emoticons']]
     upload_words(emoticons, 'anger', type='emoticon')
     if DEBUG:
         print(f'Caricati emoticons')
+    if DEBUG:
+        pprint.pprint(hashtags)
+        pprint.pp(emoticons)
+        pprint.pp(emojis)
+        pprint.pp(tokens)
 
