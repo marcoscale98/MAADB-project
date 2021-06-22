@@ -4,7 +4,7 @@ from typing import Union, Iterator, Generator, List, Tuple, Dict
 
 import nltk
 import spacy
-from emojis import emojis
+from emojis import emojis as lib_emojis
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -15,20 +15,16 @@ from impostazioni import *
 
 from res.Risorse_lessicali.Slang_words.slang_words import slang_words
 from res.Risorse_lessicali.emoji_emoticons.emoji_emoticons import posemoticons, negemoticons
-def search_emoticons(frase: str, emoticons: List = None) -> Tuple[str, List]:
+def search_emoticons(frase: str) -> Tuple[str, List]:
     trovate = []
-    if emoticons is None:
-        (frase, trovate) = search_emoticons(frase, emoticons=posemoticons)
-        frase, ems2 = search_emoticons(frase, emoticons=negemoticons)
-        trovate.extend(ems2)
-    else:
-        while (len(emoticons) > 0):
-            em = emoticons.pop()
-            index = frase.find(em)
-            if index != -1:
-                trovate.append(em)
-                frase = frase.replace(em, "", 1)
-                emoticons.append(em)
+    emoticons = posemoticons.union(negemoticons)
+    while (len(emoticons) > 0):
+        em = emoticons.pop()
+        index = frase.find(em)
+        if index != -1:
+            trovate.append(em)
+            frase = frase.replace(em, "", 1)
+            emoticons.add(em)
     return frase, trovate
 
 def preprocessing_text(frasi: Generator) -> dict[int, dict[str, Union[int, str, list, list]]]:
@@ -116,7 +112,7 @@ def extract_emoji(frase):
     :return:
     '''
     list_ems = []
-    ems: Generator = emojis.iter(frase)  # in questo modo conta prende anche le ripetizioni
+    ems: Generator = lib_emojis.iter(frase)  # in questo modo conta prende anche le ripetizioni
     for emoji in ems:
         frase = frase.replace(emoji, "")
         list_ems.append(emoji)
@@ -146,8 +142,17 @@ if __name__ == '__main__':
     # frasi = [{'message': 'Pen is on the table!'}]
     tweet_analizzati = preprocessing_text(frasi)
     i=0
+    valori = tweet_analizzati.values()
+    hashtags = [el['hashtags'] for el in valori]
+    emojis = [el['emojis'] for el in valori]
+    tokens = [el['parole'] for el in valori]
+    emoticons = [el['emoticons'] for el in valori]
     for analizzati in tweet_analizzati.values():
 
+        # upload_words(em, 'anger', type='emoticon')
+        # upload_words(em, 'anger', type='emoji')
+        # upload_words(h, 'anger', type='hashtag')
+        # upload_words(parola, 'anger', type='word')
         i+=1
         if DEBUG:
             # print(f'--------------{i}-------------')
