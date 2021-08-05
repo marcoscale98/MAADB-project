@@ -1,21 +1,17 @@
 import pprint
 import re
-from typing import Union, Iterator, Generator, List, Tuple, Dict
+from typing import Union, Generator, List, Tuple
 
-import nltk
 import spacy
 from emojis import emojis as lib_emojis
-from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
 from pymongo import MongoClient
-from regex import regex
 from impostazioni import *
 
 
 from res.Risorse_lessicali.Slang_words.slang_words import slang_words
 from res.Risorse_lessicali.emoji_emoticons.emoji_emoticons import posemoticons, negemoticons
-from src.database_buffer import upload_words
+from src.dao import upload_words, upload_hashtags, upload_emoji, upload_emoticons
 
 
 def search_emoticons(frase: str) -> Tuple[str, List]:
@@ -148,16 +144,16 @@ if __name__ == '__main__':
     print("Finito preprocessing")
     lista = tweet_analizzati.values()
     hashtags = [ogg for sotto_lista in lista for ogg in sotto_lista['hashtags']]
-    upload_words(hashtags, 'anger', type='hashtag')
+    upload_hashtags(hashtags, 'anger')
     print(f'Caricati hashtags')
     emojis = [ogg for sotto_lista in lista for ogg in sotto_lista['emojis']]
-    upload_words(emojis, 'anger', type='emoji')
+    upload_emoji(emojis, 'anger')
     print(f'Caricati emojis')
     tokens = [ogg for sotto_lista in lista for ogg in sotto_lista['parole']]
-    upload_words(tokens, 'anger', type='word')
+    upload_words(tokens, 'anger')
     print(f'Caricati tokens')
     emoticons = [ogg for sotto_lista in lista for ogg in sotto_lista['emoticons']]
-    upload_words(emoticons, 'anger', type='emoticon')
+    upload_emoticons(emoticons, 'anger')
     print(f'Caricati emoticons')
     if DEBUG:
         pprint.pprint(hashtags)

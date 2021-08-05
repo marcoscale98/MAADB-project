@@ -1,10 +1,8 @@
-import time
 import timeit
 
+from src.dao.mongodb_dao import drop_words_collection
 from src.preprocessing_text import *
-from src.database_buffer import *
 
-from impostazioni import *
 
 def test():
     client = MongoClient()
@@ -19,9 +17,9 @@ def test():
 
 def test_one_emotion(emotion, messages_db, words_db):
     messages_coll = messages_db[emotion]
-    words_coll = words_db[emotion]
-    words_coll.drop()
+    drop_words_collection(emotion, words_db)
     frasi = messages_coll.find({})
+    mongodb_dao
     for frase in frasi:
         words, hashtags, emojis, emoticons = preprocessing_text(frase['message'])
         if len(words) > 0:
