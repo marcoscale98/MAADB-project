@@ -3,9 +3,8 @@ from enum import Enum
 
 class nomi_db(Enum):
     TWITTER_WORDS:"twitter_words"
-
+    LEX_RES_DB:"lex_res_db"
     BUFFER_TWITTER_MESSAGES:"buffer_twitter_messages"
-
     BUFFER_LEXICAL_RESOURCES: "buffer_lexical_resources"
 
 class emotions(Enum):

@@ -8,7 +8,7 @@ from pymongo.database import Database
 from impostazioni import *
 from src.dao.dao import DAO
 
-emotions = ('anger', 'anticipation', 'disgust', 'fear', 'joy', 'sadness', 'surprise', 'trust')
+from nomi_db_emozioni import nomi_db, emotions
 
 class MongoDBDAO(DAO):
 
@@ -38,7 +38,7 @@ class MongoDBDAO(DAO):
         #   per ogni parola
         #       inserisco la parola in un documento `lemma:<parola stessa`
         #       inserisco il nome della risorse e quante volte compare la parola stessa (1)
-        lex_res_db = self._connect("lex_res_db")
+        lex_res_db = self._connect(nomi_db.LEX_RES_DB)
         for em in emotions:
             lemmi = {}
             emot_coll: Collection = lex_res_db[em]
@@ -74,7 +74,7 @@ class MongoDBDAO(DAO):
         self._disconnect(lex_res_db)
 
     def upload_words(self,words: list[Union[str,dict]], emotion: str, _type: str = 'word'):
-        twitter_words_db = self._connect("twitter_words")
+        twitter_words_db = self._connect(nomi_db.TWITTER_WORDS)
         emot_coll: Collection = twitter_words_db[emotion]
         if _type not in ("word", 'hashtag', 'emoji', 'emoticon'):
             raise Exception('_type not in ("word","hashtag","emoji","emoticon")')
@@ -106,7 +106,7 @@ class MongoDBDAO(DAO):
 
     def populate_db_twitter(self):
         # inseriamo nella `backup_twitter_messages` database una collezione per ogni file txt
-        twitter_db=self._connect("backup_twitter_messages")
+        twitter_db=self._connect(nomi_db.BUFFER_TWITTER_MESSAGES)
         for em in emotions:
             emot_coll: Collection = twitter_db[em]
             if emot_coll.count_documents({}) > 0:
@@ -127,7 +127,7 @@ class MongoDBDAO(DAO):
         self._disconnect(twitter_db)
 
     def drop_words_collection(self,emotion):
-        words_db = self._connect("twitter_words")
+        words_db = self._connect(nomi_db.TWITTER_WORDS)
         words_coll = words_db[emotion]
         words_coll.drop()
         self._disconnect(words_db)
