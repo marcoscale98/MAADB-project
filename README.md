@@ -61,6 +61,12 @@ a cui verrà aggiunto il campo `quant` (quantità del lemma trovato)
  Memorizzare le _nuove parole_ trovate nei tweet ma assenti nelle risorse fornite (se alla fine del conteggio saranno altamente presenti avremo trovato nuova parole da aggiungere alle risorse o avremo creato una risorsa  aggiuntiva!)
 ![image](https://user-images.githubusercontent.com/43850400/118098215-ea947000-b3d3-11eb-9a94-4d41571c25f8.png)
 
+### Dove fare Map-Reduce
+> Bisogna ipotizzare che i dati siano sharded, quindi divisi su più server
+
+1. Quando si ottengono le statistiche (è un'aggregazione, una reduce)
+2. Per aggregare gli stessi lemmi trovati nei messaggi e contarli
+
 ## Osservazioni su Risorse messaggi Twitter
 ### Tag
 USERNAME : indica un username di un utente Twitter.  
@@ -105,11 +111,15 @@ Quelle in grassetto sono le emozioni presenti anche nei file di `Twitter messagg
 - ANEW: The dictionary Affective Norms for English Words includes terms rated from 1 to 9 for each of the three dimensions of Valence, Arousal and Dominance.
 - DAL: The Dictionary of Affective Language developed by Whissell [Whissell 2009] contains words belonging to the dimensions of Pleasantness, Activation and Imagery. The 8,742 terms are rated in a three-point scale.
 
-# Informazioni amministrazione database
-## MongoDB
-### username
+## Informazioni amministrazione database
+
+### MongoDB
+
+#### username
 > Admin
-### password
+
+#### password
 > Admin
-### url
+
+#### url
 > mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/
