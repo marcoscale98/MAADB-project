@@ -15,7 +15,7 @@ class MongoDBDAO(DAO):
     def __init__(self, url):
         self.url=url
 
-    def _connect(self, db):
+    def _connect(self, db:str):
         '''
         si collega al database e restituisce l'oggetto
         :param db:
@@ -32,47 +32,26 @@ class MongoDBDAO(DAO):
         '''
         db.client.close()
 
+    def drop_collection(self, db, coll):
+        database = self._connect(db)
+        database.drop_collection(coll)
+        self._disconnect(database)
 
-    def populate_db_lexres(self):
-        # inseriamo nel database `buffer_lexical_resources` una collezione per ogni emozione
-        #   per ogni parola
-        #       inserisco la parola in un documento `lemma:<parola stessa`
-        #       inserisco il nome della risorse e quante volte compare la parola stessa (1)
+    def upload_lemmi_of_lexres(self, emozione:str, lemmi):
         lex_res_db = self._connect(Nomi_db.LEX_RES_DB.value)
-        for em in Emotions:
-            em=em.value
-            lemmi = {}
-            emot_coll: Collection = lex_res_db[em]
-            if emot_coll.count_documents({}) > 0:
-                emot_coll.drop()
-            start_path = f'res/Risorse_lessicali/Archive_risorse_lessicali/{str.capitalize(em)}/'
-            end_path = f'_{em}.txt'
-            name_lex_res = ('EmoSN', 'NRC', 'sentisense')
-            # trova i lemmi nelle lexical resources
-            for res in name_lex_res:
-                try:
-                    path = os.path.relpath(start_path + res + end_path)
-
-                    # leggiamo tutti i lemmi presenti nella risorsa lessicale
-                    with open(path, 'r', encoding='utf-8') as fp:
-                        lemma = fp.readline()
-                        while (lemma):
-                            # rimuovo endline
-                            lemma = lemma.replace("\n", "")
-                            # rimuovo parole composte
-                            if '_' not in lemma:
-                                l = lemmi.get(lemma, {})
-                                l[res] = 1
-                                lemmi[lemma] = l
-                            lemma = fp.readline()
-                except FileNotFoundError:
-                    pass
-            lemmi = list(map(lambda kv: {"lemma": kv[0], "res": kv[1]}, lemmi.items()))
-            res_insert = emot_coll.insert_many(lemmi)
-            print(f'N. documenti inseriti nella collezione {emot_coll.name}: {len(res_insert.inserted_ids)}')
-            print(f'n. documenti presenti nella collezione {emot_coll.name}: {emot_coll.count_documents({})}')
-
+        num = lex_res_db[emozione].insert_many(lemmi)
+        print(f'N. documenti inseriti nella collezione {lex_res_db[emozione].name}: {len(num.inserted_ids)}')
+        print(f'n. documenti presenti nella collezione {lex_res_db[emozione].name}: {lex_res_db[emozione].count_documents({})}')
         self._disconnect(lex_res_db)
+        return num.inserted_ids
+
+    def upload_twitter_messages(self,emozione:str, messages):
+        twitter_db = self._connect(Nomi_db.BUFFER_TWITTER_MESSAGES.value)
+        num = twitter_db[emozione].insert_many(messages)
+        print(f'N. documenti inseriti nella collezione {twitter_db[emozione].name}: {len(num.inserted_ids)}')
+        print(f'n. documenti presenti nella collezione {twitter_db[emozione].name}: {twitter_db[emozione].count_documents({})}')
+        self._disconnect(twitter_db)
+        return num.inserted_ids
 
     def upload_words(self,words: list[Union[str,dict]], emotion: str, _type: str = 'word'):
         twitter_words_db = self._connect(Nomi_db.TWITTER_WORDS.value)
@@ -105,34 +84,18 @@ class MongoDBDAO(DAO):
     def upload_hashtags(self,hashtags, emotion):
         self.upload_words(hashtags, emotion, 'hashtag')
 
-    def populate_db_twitter(self):
-        # inseriamo nella `backup_twitter_messages` database una collezione per ogni file txt
-        twitter_db=self._connect(Nomi_db.BUFFER_TWITTER_MESSAGES.value)
-        for em in Emotions:
-            em = em.value
-            emot_coll: Collection = twitter_db[em]
-            if emot_coll.count_documents({}) > 0:
-                emot_coll.drop()
-            path = f'res/Twitter_messaggi/dataset_dt_{em}_60k.txt'
-            messages = []
-            path = os.path.relpath(path)
-            # leggiamo tutti i messaggi di una emozione
-            with open(path, 'r', encoding='utf-8') as fp:
-                mess = fp.readline()
-                while (mess):
-                    messages.append(mess)
-                    mess = fp.readline()
-            messages = list(map(lambda m: {"message": m}, messages))
-            res_insert = emot_coll.insert_many(messages)
-            print(f'N. documenti inseriti nella collezione {emot_coll.name}: {len(res_insert.inserted_ids)}')
-            print(f'n. documenti presenti nella collezione {emot_coll.name}: {emot_coll.count_documents({})}')
-        self._disconnect(twitter_db)
-
     def drop_words_collection(self,emotion):
         words_db = self._connect(Nomi_db.TWITTER_WORDS.value)
         words_coll = words_db[emotion]
         words_coll.drop()
         self._disconnect(words_db)
+
+    def drop_if_not_empty(self, db: str, emozione: str):
+        database = self._connect(db)
+        emot_coll = database[emozione]
+        if emot_coll.count_documents({}) > 0:
+            emot_coll.drop()
+        self._disconnect(database)
 
 
 if __name__ == '__main__':

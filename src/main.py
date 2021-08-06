@@ -1,7 +1,66 @@
+import os
 import timeit
 
+from src.dao.mongodb_dao import MongoDBDAO
+from src.dao.nomi_db_emozioni import Emotions, Nomi_db
 from src.preprocessing_text import *
 
+
+def populate_db_lexres():
+    # inseriamo nel database `buffer_lexical_resources` una collezione per ogni emozione
+    #   per ogni parola
+    #       inserisco la parola in un documento `lemma:<parola stessa>`
+    #       inserisco il nome della risorse e quante volte compare la parola stessa (1)
+    mongodao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
+    for em in Emotions:
+        em = em.value
+        lemmi = {}
+        mongodao.drop_if_not_empty(Nomi_db.LEX_RES_DB.value, em)
+        start_path = f'res/Risorse_lessicali/Archive_risorse_lessicali/{str.capitalize(em)}/'
+        end_path = f'_{em}.txt'
+        name_lex_res = ('EmoSN', 'NRC', 'sentisense')
+        # trova i lemmi nelle lexical resources
+        for res in name_lex_res:
+            try:
+                path = os.path.relpath(start_path + res + end_path)
+
+                # leggiamo tutti i lemmi presenti nella risorsa lessicale
+                with open(path, 'r', encoding='utf-8') as fp:
+                    lemma = fp.readline()
+                    while (lemma):
+                        # rimuovo endline
+                        lemma = lemma.replace("\n", "")
+                        # rimuovo parole composte
+                        if '_' not in lemma:
+                            l = lemmi.get(lemma, {})
+                            l[res] = 1
+                            lemmi[lemma] = l
+                        lemma = fp.readline()
+            except FileNotFoundError:
+                pass
+        lemmi = list(map(lambda kv: {"lemma": kv[0], "res": kv[1]}, lemmi.items()))
+        res_insert = mongodao.upload_lemmi_of_lexres(em,lemmi)
+
+def populate_db_twitter():
+    '''
+    inseriamo nella `backup_twitter_messages` database una collezione per ogni file txt
+    :return:
+    '''
+    mongodao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
+    for em in Emotions:
+        em = em.value
+        mongodao.drop_if_not_empty(Nomi_db.BUFFER_TWITTER_MESSAGES.value,em)
+        path = f'res/Twitter_messaggi/dataset_dt_{em}_60k.txt'
+        messages = []
+        path = os.path.relpath(path)
+        # leggiamo tutti i messaggi di una emozione
+        with open(path, 'r', encoding='utf-8') as fp:
+            mess = fp.readline()
+            while (mess):
+                messages.append(mess)
+                mess = fp.readline()
+        messages = list(map(lambda m: {"message": m}, messages))
+        res_insert = mongodao.upload_twitter_messages(em,messages)
 
 # def test():
 #     client = MongoClient()
@@ -31,7 +90,7 @@ from src.preprocessing_text import *
 #             upload_words(emoticons, emotion, "emoticon")
 #
 #
-# if __name__ == '__main__':
-#
-#     test_one_emotion()
+if __name__ == '__main__':
 
+    # populate_db_lexres()
+    populate_db_twitter()

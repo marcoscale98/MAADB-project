@@ -104,3 +104,12 @@ Quelle in grassetto sono le emozioni presenti anche nei file di `Twitter messagg
 - **SS**: SentiSense is a concept-based affective lexicon with a wide set of categories developed by Carrillo de Albornoz [Carrillo de Albornoz et al. 2012], including 5,496 words and 2,190 synsets from WordNet, labeled with an emotion from a set of 14 categories.
 - ANEW: The dictionary Affective Norms for English Words includes terms rated from 1 to 9 for each of the three dimensions of Valence, Arousal and Dominance.
 - DAL: The Dictionary of Affective Language developed by Whissell [Whissell 2009] contains words belonging to the dimensions of Pleasantness, Activation and Imagery. The 8,742 terms are rated in a three-point scale.
+
+# Informazioni amministrazione database
+## MongoDB
+### username
+> Admin
+### password
+> Admin
+### url
+> mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/

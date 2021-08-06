@@ -7,10 +7,25 @@ class DAO:
     """
     def __init__(self,url):
         self.url=url
-    def populate_db_lexres(self):
+
+    def drop_collection(self, db, coll):
+        raise InterfaceException
+
+    def upload_lemmi_of_lexres(self, emozione:str, lemmi):
         '''
-        carica su db il file delle lexical resouces
-        :return:
+        carica i lemmi nel `lexres_db`
+        :param emozione:
+        :param lemmi:
+        :return: numero di inserimenti
+        '''
+        raise InterfaceException
+
+    def upload_twitter_messages(self,emozione:str, messages):
+        '''
+        carica i messaggi twitter nel database
+        :param emozione:
+        :param messages:
+        :return: numero di inserimenti
         '''
         raise InterfaceException
 
@@ -33,9 +48,5 @@ class DAO:
     def upload_hashtags(self,hashtags, emotion):
         raise InterfaceException
 
-    def populate_db_twitter(self):
-        """
-        popola il database dei messaggi twitter
-        :return:
-        """
+    def drop_if_not_empty(self, db:str, emozione:str):
         raise InterfaceException
