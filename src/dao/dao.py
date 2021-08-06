@@ -1,4 +1,7 @@
 from typing import Union
+
+from pymongo.database import Database
+
 from src.user_exception import InterfaceException
 
 class DAO:
@@ -7,6 +10,12 @@ class DAO:
     """
     def __init__(self,url):
         self.url=url
+
+    def _connect(self, db:str, collezione: str):
+        raise InterfaceException
+
+    def _disconnect(self, db: Database):
+        raise InterfaceException
 
     def drop_collection(self, db, coll):
         raise InterfaceException

@@ -13,7 +13,7 @@ from src.dao.nomi_db_emozioni import Nomi_db, Emotions
 class MongoDBDAO(DAO):
 
     def __init__(self, url):
-        self.url=url
+        super().__init__(url)
 
     def _connect(self, db:str):
         '''
