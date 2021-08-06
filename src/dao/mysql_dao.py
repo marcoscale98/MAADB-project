@@ -4,16 +4,34 @@ from pymongo.database import Database
 
 from src.dao.dao import DAO
 
+import mysql.connector
+from mysql.connector import errorcode, MySQLConnection
+
+from src.config import *
 
 class MySQLDAO(DAO):
     def __init__(self, url):
         super().__init__(url)
 
     def _connect(self, db: str, collezione: str):
-        return super()._connect(db, collezione)
+        '''
 
-    def _disconnect(self, db: Database):
-        return super()._disconnect(db)
+        :param db: inutilizzato
+        :param collezione: inutilizzato
+        :return:
+        '''
+        try:
+            cnx = mysql.connector.connect(**MYSQL_CONFIG)
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Something is wrong with your user name or password")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print("Database does not exist")
+            else:
+                print(err)
+
+    def _disconnect(self, conn: MySQLConnection):
+        conn.close()
 
     def drop_collection(self, db, coll):
         return super().drop_collection(db, coll)
