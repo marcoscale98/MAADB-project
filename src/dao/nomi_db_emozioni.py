@@ -16,3 +16,8 @@ class Emotions(Enum):
     SADNESS='sadness'
     SURPRISE='surprise'
     TRUST='trust'
+
+class Risorse(Enum):
+    EmoSN='EmoSN'
+    NRC='NRC'
+    sentisense='sentisense'
