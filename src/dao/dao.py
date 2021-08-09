@@ -11,7 +11,7 @@ class DAO:
     def __init__(self,url):
         self.url=url
 
-    def _connect(self, db:str, collezione: str):
+    def _connect(self, db:str=None, collezione: str=None):
         raise InterfaceException
 
     def _disconnect(self, db: Database):

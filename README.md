@@ -127,3 +127,11 @@ Quelle in grassetto sono le emozioni presenti anche nei file di `Twitter messagg
 
 #### url
 > mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/
+
+### MySQL
+#### username
+> root
+#### password
+nessuna
+#### url
+> 127.0.0.1

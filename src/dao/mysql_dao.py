@@ -1,3 +1,4 @@
+import sys
 from typing import Union
 
 from pymongo.database import Database
@@ -10,10 +11,10 @@ from mysql.connector import errorcode, MySQLConnection
 from src.config import *
 
 class MySQLDAO(DAO):
-    def __init__(self, url):
+    def __init__(self, url=None):
         super().__init__(url)
 
-    def _connect(self, db: str, collezione: str):
+    def _connect(self, db: str=None, collezione: str=None):
         '''
 
         :param db: inutilizzato
@@ -28,16 +29,26 @@ class MySQLDAO(DAO):
             elif err.errno == errorcode.ER_BAD_DB_ERROR:
                 print("Database does not exist")
             else:
-                print(err)
+                print(err,file=sys.stderr)
+        else:
+            return cnx
 
     def _disconnect(self, conn: MySQLConnection):
         conn.close()
 
     def drop_collection(self, db, coll):
+        '''
+
+        :param db:
+        :param coll:
+        :return:
+        '''
         return super().drop_collection(db, coll)
 
     def upload_lemmi_of_lexres(self, emozione: str, lemmi):
-        return super().upload_lemmi_of_lexres(emozione, lemmi)
+        conn:MySQLConnection=self._connect()
+        print(conn)
+        self._disconnect(conn)
 
     def upload_twitter_messages(self, emozione: str, messages):
         return super().upload_twitter_messages(emozione, messages)
@@ -56,3 +67,7 @@ class MySQLDAO(DAO):
 
     def drop_if_not_empty(self, db: str, emozione: str):
         return super().drop_if_not_empty(db, emozione)
+
+if __name__ == '__main__':
+    dao = MySQLDAO()
+    dao.upload_lemmi_of_lexres(None,None)

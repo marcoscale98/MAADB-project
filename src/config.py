@@ -1,6 +1,6 @@
 MYSQL_CONFIG = {
-    'user': 'admin',
-    'password':'admin',
+    'user': 'root',
+    'password':'',
     'host':'127.0.0.1',
-    'database':'maadb-project'
+    'database':'maadb_project'
 }
