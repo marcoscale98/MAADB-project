@@ -13,7 +13,7 @@ joblib==1.0.1
 MarkupSafe==2.0.1
 murmurhash==1.0.5
 nltk==3.6.2
-numpy==1.20.3
+numpy
 packaging==20.9
 pathy==0.5.2
 preshed==3.0.5
@@ -32,3 +32,5 @@ tqdm==4.60.0
 typer==0.3.2
 urllib3==1.26.5
 wasabi==0.8.2
+mysql-connector-python
+dnspython

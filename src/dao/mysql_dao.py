@@ -1,6 +1,7 @@
 import sys
-from typing import Union
+from typing import Union, List
 
+from mysql.connector.cursor import CursorBase
 from pymongo.database import Database
 
 from src.dao.dao import DAO
@@ -23,6 +24,7 @@ class MySQLDAO(DAO):
         '''
         try:
             cnx = mysql.connector.connect(**MYSQL_CONFIG)
+            cnx.autocommit=True
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
@@ -36,24 +38,29 @@ class MySQLDAO(DAO):
     def _disconnect(self, conn: MySQLConnection):
         conn.close()
 
-    def drop_collection(self, db, coll):
-        '''
-
-        :param db:
-        :param coll:
-        :return:
-        '''
-        return super().drop_collection(db, coll)
-
-    def upload_lemmi_of_lexres(self, emozione: str, lemmi):
+    def upload_lemmi_of_lexres(self, emozione: str, lemmi, drop_if_not_empty:bool):
         conn:MySQLConnection=self._connect()
-        print(conn)
+        cursor=conn.cursor()
+        if drop_if_not_empty:
+            self._drop_if_not_empty(cursor,"risorsa_lessicale")
+        query='INSERT INTO risorsa_lessicale (risorsa, emozione, parola) VALUES (%s,%s,%s)'
+        lemmi_map= list(map(lambda obj: (obj['res'],emozione,obj['lemma']), lemmi))
+        cursor.executemany(query,lemmi_map)
         self._disconnect(conn)
 
-    def upload_twitter_messages(self, emozione: str, messages):
-        return super().upload_twitter_messages(emozione, messages)
+    def upload_twitter_messages(self, emozione: str, messages, drop_if_not_empty:bool):
+        conn:MySQLConnection= self._connect()
+        #faccio upload dei messaggi twitter
+        cursor=conn.cursor()
+        if drop_if_not_empty:
+            self._drop_if_not_empty(cursor, "messaggio_twitter")
+        data = list(map(lambda message: (message, emozione), messages))
+        query="INSERT INTO messaggio_twitter (messaggio,emozione) VALUES (%s,%s)"
+        cursor.executemany(query,data)
+        cursor.close()
+        self._disconnect(conn)
 
-    def upload_words(self, words: list[Union[str, dict]], emotion: str, type: str = 'word'):
+    def upload_words(self, words: List[Union[str, dict]], emotion: str, type: str = 'word'):
         return super().upload_words(words, emotion, type)
 
     def upload_emoji(self, emoji, emotion):
@@ -65,9 +72,6 @@ class MySQLDAO(DAO):
     def upload_hashtags(self, hashtags, emotion):
         return super().upload_hashtags(hashtags, emotion)
 
-    def drop_if_not_empty(self, db: str, emozione: str):
-        return super().drop_if_not_empty(db, emozione)
-
-if __name__ == '__main__':
-    dao = MySQLDAO()
-    dao.upload_lemmi_of_lexres(None,None)
+    def _drop_if_not_empty(self, cursor: CursorBase, table: str):
+        query='TRUNCATE ' + table
+        cursor.execute(query)

@@ -27,18 +27,6 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `emoji`
---
-
-DROP TABLE IF EXISTS `emoji`;
-CREATE TABLE `emoji` (
-  `id` int(11) NOT NULL,
-  `emoji` varchar(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
 -- Struttura della tabella `emoji_contenuta`
 --
 
@@ -52,17 +40,6 @@ CREATE TABLE `emoji_contenuta` (
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `emoticon`
---
-
-DROP TABLE IF EXISTS `emoticon`;
-CREATE TABLE `emoticon` (
-  `emoticon` varchar(6) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
 -- Struttura della tabella `emoticon_contenuta`
 --
 
@@ -71,17 +48,6 @@ CREATE TABLE `emoticon_contenuta` (
   `emoticon` varchar(6) NOT NULL,
   `id_tweet` int(32) NOT NULL,
   `quantita` int(11) NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `hashtag`
---
-
-DROP TABLE IF EXISTS `hashtag`;
-CREATE TABLE `hashtag` (
-  `hashtag` varchar(32) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -153,13 +119,6 @@ CREATE TABLE `risorsa_lessicale` (
 --
 
 --
--- Indici per le tabelle `emoji`
---
-ALTER TABLE `emoji`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `emoji` (`emoji`);
-
---
 -- Indici per le tabelle `emoji_contenuta`
 --
 ALTER TABLE `emoji_contenuta`
@@ -167,23 +126,11 @@ ALTER TABLE `emoji_contenuta`
   ADD KEY `id_tweet_fk1` (`id_tweet`);
 
 --
--- Indici per le tabelle `emoticon`
---
-ALTER TABLE `emoticon`
-  ADD PRIMARY KEY (`emoticon`);
-
---
 -- Indici per le tabelle `emoticon_contenuta`
 --
 ALTER TABLE `emoticon_contenuta`
   ADD PRIMARY KEY (`emoticon`,`id_tweet`),
   ADD KEY `id_tweet_fk` (`id_tweet`);
-
---
--- Indici per le tabelle `hashtag`
---
-ALTER TABLE `hashtag`
-  ADD PRIMARY KEY (`hashtag`);
 
 --
 -- Indici per le tabelle `hashtag_contenuto`
@@ -221,12 +168,6 @@ ALTER TABLE `risorsa_lessicale`
 --
 -- AUTO_INCREMENT per le tabelle scaricate
 --
-
---
--- AUTO_INCREMENT per la tabella `emoji`
---
-ALTER TABLE `emoji`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT per la tabella `messaggio_twitter`

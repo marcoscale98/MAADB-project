@@ -32,47 +32,49 @@ class MongoDBDAO(DAO):
         '''
         db.client.close()
 
-    def drop_collection(self, db, coll):
-        database = self._connect(db)
-        database.drop_collection(coll)
-        self._disconnect(database)
-
-    def upload_lemmi_of_lexres(self, emozione:str, lemmi):
+    def upload_lemmi_of_lexres(self, emozione:str, lemmi, drop_if_not_empty:bool):
         lex_res_db = self._connect(Nomi_db.LEX_RES_DB.value)
+        if drop_if_not_empty:
+            self.drop_if_not_empty(Nomi_db.LEX_RES_DB.value, emozione)
         num = lex_res_db[emozione].insert_many(lemmi)
         print(f'N. documenti inseriti nella collezione {lex_res_db[emozione].name}: {len(num.inserted_ids)}')
         print(f'n. documenti presenti nella collezione {lex_res_db[emozione].name}: {lex_res_db[emozione].count_documents({})}')
         self._disconnect(lex_res_db)
         return num.inserted_ids
 
-    def upload_twitter_messages(self,emozione:str, messages):
+    def upload_twitter_messages(self,emozione:str, messages, drop_if_not_empty:bool):
+        messages = list(map(lambda m: {"message": m}, messages))
         twitter_db = self._connect(Nomi_db.BUFFER_TWITTER_MESSAGES.value)
+        if drop_if_not_empty:
+            self.drop_if_not_empty(Nomi_db.LEX_RES_DB.value, emozione)
         num = twitter_db[emozione].insert_many(messages)
         print(f'N. documenti inseriti nella collezione {twitter_db[emozione].name}: {len(num.inserted_ids)}')
         print(f'n. documenti presenti nella collezione {twitter_db[emozione].name}: {twitter_db[emozione].count_documents({})}')
         self._disconnect(twitter_db)
         return num.inserted_ids
 
-    def upload_words(self,words: list[Union[str,dict]], emotion: str, _type: str = 'word'):
+    def upload_words(self, words: list[Union[str,dict]], emotion: str, tipo: str = 'word', drop_if_not_empty: bool =False):
         twitter_words_db = self._connect(Nomi_db.TWITTER_WORDS.value)
+        if drop_if_not_empty:
+            self.drop_if_not_empty(Nomi_db.TWITTER_WORDS.value, emotion)
         emot_coll: Collection = twitter_words_db[emotion]
-        if _type not in ("word", 'hashtag', 'emoji', 'emoticon'):
-            raise Exception('_type not in ("word","hashtag","emoji","emoticon")')
+        if tipo not in ("word", 'hashtag', 'emoji', 'emoticon'):
+            raise Exception('tipo not in ("word","hashtag","emoji","emoticon")')
 
-        words = list(map(lambda word: self._add_type(word, _type), words))
+        words = list(map(lambda word: self._add_type(word, tipo), words))
         result = emot_coll[emotion].insert_many(words)
         if DEBUG:
-            print(f'Inseriti {len(result.inserted_ids)} {_type} in {twitter_words_db.name}.{emot_coll.name}')
+            print(f'Inseriti {len(result.inserted_ids)} {tipo} in {twitter_words_db.name}.{emot_coll.name}')
         self._disconnect(twitter_words_db)
 
     def _add_type(self,word, tipo):
         if type(word)==str:
             word= {
                 'token':word,
-                'type':tipo,
+                'tipo':tipo,
             }
         else:
-            word['_type'] = tipo
+            word['tipo'] = tipo
         return word
 
     def upload_emoji(self,emoji, emotion):
@@ -99,6 +101,7 @@ class MongoDBDAO(DAO):
 
 
 if __name__ == '__main__':
-    mongodb_dao = MongoDBDAO("mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/")
+    pass
+    # mongodb_dao = MongoDBDAO("mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/")
     # mongodb_dao.populate_db_twitter()
-    mongodb_dao.populate_db_lexres()
+    # mongodb_dao.populate_db_lexres()

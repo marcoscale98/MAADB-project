@@ -2,20 +2,19 @@ import os
 import timeit
 
 from src.dao.mongodb_dao import MongoDBDAO
+from src.dao.mysql_dao import MySQLDAO
 from src.dao.nomi_db_emozioni import Emotions, Nomi_db
 from src.preprocessing_text import *
 
 
-def populate_db_lexres():
+def populate_db_lexres(dao,drop_if_not_empty):
     # inseriamo nel database `buffer_lexical_resources` una collezione per ogni emozione
     #   per ogni parola
     #       inserisco la parola in un documento `lemma:<parola stessa>`
     #       inserisco il nome della risorse e quante volte compare la parola stessa (1)
-    mongodao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
     for em in Emotions:
         em = em.value
         lemmi = {}
-        mongodao.drop_if_not_empty(Nomi_db.LEX_RES_DB.value, em)
         start_path = f'res/Risorse_lessicali/Archive_risorse_lessicali/{str.capitalize(em)}/'
         end_path = f'_{em}.txt'
         name_lex_res = ('EmoSN', 'NRC', 'sentisense')
@@ -39,17 +38,16 @@ def populate_db_lexres():
             except FileNotFoundError:
                 pass
         lemmi = list(map(lambda kv: {"lemma": kv[0], "res": kv[1]}, lemmi.items()))
-        res_insert = mongodao.upload_lemmi_of_lexres(em,lemmi)
+        dao.upload_lemmi_of_lexres(em, lemmi,drop_if_not_empty)
 
-def populate_db_twitter():
+
+def populate_db_twitter(dao, drop_if_not_empty):
     '''
     inseriamo nella `backup_twitter_messages` database una collezione per ogni file txt
     :return:
     '''
-    mongodao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
     for em in Emotions:
         em = em.value
-        mongodao.drop_if_not_empty(Nomi_db.BUFFER_TWITTER_MESSAGES.value,em)
         path = f'res/Twitter_messaggi/dataset_dt_{em}_60k.txt'
         messages = []
         path = os.path.relpath(path)
@@ -59,8 +57,8 @@ def populate_db_twitter():
             while (mess):
                 messages.append(mess)
                 mess = fp.readline()
-        messages = list(map(lambda m: {"message": m}, messages))
-        res_insert = mongodao.upload_twitter_messages(em,messages)
+        res_insert = dao.upload_twitter_messages(em, messages, drop_if_not_empty)
+
 
 # def test():
 #     client = MongoClient()
@@ -91,6 +89,8 @@ def populate_db_twitter():
 #
 #
 if __name__ == '__main__':
-
-    # populate_db_lexres()
-    populate_db_twitter()
+    DROP = True
+    # dao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
+    dao = MySQLDAO('jdbc:mysql://localhost:3306?serverTimezone=UTC')
+    # populate_db_lexres(dao,DROP)
+    populate_db_twitter(dao, DROP)

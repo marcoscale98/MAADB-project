@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List
 
 from pymongo.database import Database
 
@@ -17,10 +17,7 @@ class DAO:
     def _disconnect(self, db: Database):
         raise InterfaceException
 
-    def drop_collection(self, db, coll):
-        raise InterfaceException
-
-    def upload_lemmi_of_lexres(self, emozione:str, lemmi):
+    def upload_lemmi_of_lexres(self, emozione:Union[str,None], lemmi, drop_if_not_empty: bool):
         '''
         carica i lemmi nel `lexres_db`
         :param emozione:
@@ -29,7 +26,7 @@ class DAO:
         '''
         raise InterfaceException
 
-    def upload_twitter_messages(self,emozione:str, messages):
+    def upload_twitter_messages(self,emozione:str, messages, drop_if_not_empty: bool):
         '''
         carica i messaggi twitter nel database
         :param emozione:
@@ -38,7 +35,7 @@ class DAO:
         '''
         raise InterfaceException
 
-    def upload_words(self,words: list[Union[str,dict]], emotion: str, type: str = 'word'):
+    def upload_words(self, words: List[Union[str, dict]], emotion: str, type: str = 'word'):
         """
         per fare upload di parole, hashtags, emoji, emoticons
         :param words:
@@ -57,5 +54,4 @@ class DAO:
     def upload_hashtags(self,hashtags, emotion):
         raise InterfaceException
 
-    def drop_if_not_empty(self, db:str, emozione:str):
-        raise InterfaceException
+

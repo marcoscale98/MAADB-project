@@ -30,3 +30,13 @@ Convertire liste in set e dizionari nel preprocessing
 ## con ottimizzazione di upload_words
 473 s per 60000 tweets
 11 s per 60000 tweets
+
+#struttura lemmi
+```
+lemmi = [
+   {
+      lemma: str,
+      res: str,
+   }
+]
+```

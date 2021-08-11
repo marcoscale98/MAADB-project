@@ -134,4 +134,4 @@ Quelle in grassetto sono le emozioni presenti anche nei file di `Twitter messagg
 #### password
 nessuna
 #### url
-> 127.0.0.1
+> jdbc:mysql://localhost:3306?serverTimezone=UTC
