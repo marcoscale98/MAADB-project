@@ -44,7 +44,11 @@ class MySQLDAO(DAO):
         if drop_if_not_empty:
             self._drop_if_not_empty(cursor,"risorsa_lessicale")
         query='INSERT INTO risorsa_lessicale (risorsa, emozione, parola) VALUES (%s,%s,%s)'
-        lemmi_map= list(map(lambda obj: (obj['res'],emozione,obj['lemma']), lemmi))
+        lemmi_map=[]
+        for lemma in lemmi:
+            resources = lemma['res'].items()
+            for res in resources:
+                lemmi_map.append((res,emozione,lemma['lemma']))
         cursor.executemany(query,lemmi_map)
         self._disconnect(conn)
 

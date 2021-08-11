@@ -21,8 +21,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `maadb_project`
 --
-# CREATE DATABASE IF NOT EXISTS `maadb_project` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-# USE `maadb_project`;
+CREATE DATABASE IF NOT EXISTS `maadb_project` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `maadb_project`;
 
 -- --------------------------------------------------------
 
