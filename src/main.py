@@ -58,6 +58,7 @@ def populate_db_twitter(dao, drop_if_not_empty):
                 messages.append(mess)
                 mess = fp.readline()
         res_insert = dao.upload_twitter_messages(em, messages, drop_if_not_empty)
+        print(f'Inseriti {res_insert} messaggi dell\'emozione {em}')
 
 
 # def test():
@@ -92,5 +93,5 @@ if __name__ == '__main__':
     DROP = True
     # dao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
     dao = MySQLDAO('jdbc:mysql://localhost:3306?serverTimezone=UTC')
-    populate_db_lexres(dao,DROP)
-    # populate_db_twitter(dao, DROP)
+    # populate_db_lexres(dao,DROP)
+    populate_db_twitter(dao, DROP)

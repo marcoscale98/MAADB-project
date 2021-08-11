@@ -1,6 +1,7 @@
 import sys
 from typing import Union, List
 
+import math
 from mysql.connector.cursor import CursorBase
 from pymongo.database import Database
 
@@ -46,23 +47,30 @@ class MySQLDAO(DAO):
         query='INSERT INTO risorsa_lessicale (risorsa, emozione, parola) VALUES (%s,%s,%s)'
         lemmi_map=[]
         for lemma in lemmi:
-            resources = lemma['res'].items()
+            resources = lemma['res'].keys()
             for res in resources:
                 lemmi_map.append((res,emozione,lemma['lemma']))
         cursor.executemany(query,lemmi_map)
         self._disconnect(conn)
+        return len(lemmi_map)
 
-    def upload_twitter_messages(self, emozione: str, messages, drop_if_not_empty:bool):
+    def chunk_by_size(self,lst:List, size:int):
+            n = math.ceil(len(lst) / size)
+            return list(map(lambda x: lst[x * size:x * size + size], list(range(n))))
+
+    def upload_twitter_messages(self, emozione: str, messages:list, drop_if_not_empty:bool):
         conn:MySQLConnection= self._connect()
         #faccio upload dei messaggi twitter
         cursor=conn.cursor()
+        chunkes= self.chunk_by_size(messages, 1000)
         if drop_if_not_empty:
             self._drop_if_not_empty(cursor, "messaggio_twitter")
-        data = list(map(lambda message: (message, emozione), messages))
-        query="INSERT INTO messaggio_twitter (messaggio,emozione) VALUES (%s,%s)"
-        cursor.executemany(query,data)
-        cursor.close()
+        for chuck in chunkes:
+            data = list(map(lambda message: (message, emozione), chuck))
+            query="INSERT INTO messaggio_twitter (messaggio,emozione) VALUES (%s,%s)"
+            cursor.executemany(query,data)
         self._disconnect(conn)
+        return len(messages)
 
     def upload_words(self, words: List[Union[str, dict]], emotion: str, type: str = 'word'):
         return super().upload_words(words, emotion, type)
