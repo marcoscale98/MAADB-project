@@ -33,7 +33,7 @@ USE `maadb_project`;
 DROP TABLE IF EXISTS `emoji_contenuta`;
 CREATE TABLE `emoji_contenuta` (
   `emoji` varchar(1) NOT NULL,
-  `id_tweet` int(32) NOT NULL,
+  `emozione` enum('anger','anticipation','disgust','fear','joy','sadness','surprise','trust') NOT NULL,
   `quantita` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -46,7 +46,7 @@ CREATE TABLE `emoji_contenuta` (
 DROP TABLE IF EXISTS `emoticon_contenuta`;
 CREATE TABLE `emoticon_contenuta` (
   `emoticon` varchar(6) NOT NULL,
-  `id_tweet` int(32) NOT NULL,
+  `emozione` enum('anger','anticipation','disgust','fear','joy','sadness','surprise','trust') NOT NULL,
   `quantita` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -59,7 +59,7 @@ CREATE TABLE `emoticon_contenuta` (
 DROP TABLE IF EXISTS `hashtag_contenuto`;
 CREATE TABLE `hashtag_contenuto` (
   `hashtag` varchar(20) NOT NULL,
-  `id_tweet` int(32) NOT NULL,
+  `emozione` enum('anger','anticipation','disgust','fear','joy','sadness','surprise','trust') NOT NULL,
   `quantita` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -96,7 +96,7 @@ CREATE TABLE `parola` (
 DROP TABLE IF EXISTS `parola_contenuta`;
 CREATE TABLE `parola_contenuta` (
   `parola` varchar(32) NOT NULL,
-  `id_tweet` int(32) NOT NULL,
+  `emozione` enum('anger','anticipation','disgust','fear','joy','sadness','surprise','trust') NOT NULL,
   `quantita` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -122,22 +122,19 @@ CREATE TABLE `risorsa_lessicale` (
 -- Indici per le tabelle `emoji_contenuta`
 --
 ALTER TABLE `emoji_contenuta`
-  ADD PRIMARY KEY (`emoji`,`id_tweet`),
-  ADD KEY `id_tweet_fk1` (`id_tweet`);
+  ADD PRIMARY KEY (`emoji`,`emozione`);
 
 --
 -- Indici per le tabelle `emoticon_contenuta`
 --
 ALTER TABLE `emoticon_contenuta`
-  ADD PRIMARY KEY (`emoticon`,`id_tweet`),
-  ADD KEY `id_tweet_fk` (`id_tweet`);
+  ADD PRIMARY KEY (`emoticon`,`emozione`);
 
 --
 -- Indici per le tabelle `hashtag_contenuto`
 --
 ALTER TABLE `hashtag_contenuto`
-  ADD PRIMARY KEY (`hashtag`,`id_tweet`),
-  ADD KEY `id_tweet_fk2` (`id_tweet`);
+  ADD PRIMARY KEY (`hashtag`,`emozione`);
 
 --
 -- Indici per le tabelle `messaggio_twitter`
@@ -155,8 +152,7 @@ ALTER TABLE `parola`
 -- Indici per le tabelle `parola_contenuta`
 --
 ALTER TABLE `parola_contenuta`
-  ADD PRIMARY KEY (`parola`,`id_tweet`),
-  ADD KEY `id_tweet_fk3` (`id_tweet`);
+  ADD PRIMARY KEY (`parola`,`emozione`);
 
 --
 -- Indici per le tabelle `risorsa_lessicale`

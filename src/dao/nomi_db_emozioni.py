@@ -2,10 +2,9 @@ from enum import Enum
 
 
 class Nomi_db_mongo(Enum):
-    TWITTER_WORDS="twitter_words"
-    LEX_RES_DB="lex_res_db"
-    BUFFER_TWITTER_MESSAGES="buffer_twitter_messages"
-    BUFFER_LEXICAL_RESOURCES= "buffer_lexical_resources"
+    TOKEN_TWITTER= "token_twitter"
+    RISORSA_LESSICALE= "risorsa_lessicale"
+    MESSAGGIO_TWITTER= "messaggio_twitter"
 
 class Nomi_db_mysql(Enum):
     EMOJI_CONTENUTA='emoji_contenuta'

@@ -1,4 +1,4 @@
-from typing import Union, List
+from typing import Union, List, Optional, Generator
 
 from pymongo.database import Database
 
@@ -54,4 +54,9 @@ class DAO:
     def upload_hashtags(self,hashtags, emotion):
         raise InterfaceException
 
+    def download_messaggi_twitter(self,emozione:Optional[str])->Generator:
+        '''
+        generatore di messaggi twitter presi dal db
+        '''
+        raise InterfaceException
 

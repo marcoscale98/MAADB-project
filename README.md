@@ -7,7 +7,8 @@ Python 3.9
 ### Cosa c'è da creare?
 #### Database di buffer
  Database dove mantenere le risorse lessicali e i messaggi di twitter (questi poi verranno recuperati come uno stream teoricamente infinito di dati)
-##### Schema di *buffer_twitter_messages*
+##### Schema di *messaggio_twitter*
+###### MongoDB
 Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:  
 ````
 {
@@ -15,7 +16,11 @@ Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:
     message: str,
 }
 ````
-##### Schema di *buffer_lexical_resources*
+###### MySQL
+![](res/immagini_readme/messaggio_twitter_table_schema.png)
+
+##### Schema di *risorsa_lessicale*
+###### MongoDB
 Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:  
 ````
 {
@@ -28,6 +33,8 @@ Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:
     }
 }
 ````
+###### MySQL
+![](res/immagini_readme/risorsa_lessicale_table_schema.png)
 #### Pipeline di **preprocessing** dei tweets in python
 - [x] Eliminare USERNAME e URL
 - [x] processare gli hashtag: possiamo contarli e fare statistiche anche su quelli o possiamo buttarli
@@ -40,12 +47,15 @@ Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:
 
 #### Database di analytics
  database dove mantenere le statistiche elaborate richieste:
+- per ogni emozione (sentimento) dove X è un tipo di risorsa e Y è un sentimento:
   - parole più **frequenti** nei tweet (graficamente visualizzate con una word cloud)
-  - emoji più frequenti nei tweet (graficamente visualizzate con una word cloud)
-  - emoticons più frequenti nei tweet (graficamente visualizzate con una word cloud)
-  - per ciascun sentimento (X e Y sono sentimenti), la percentuale delle parole delle risorse lessicali presenti nei tweets: _perc_persence_lex_words(X,Y)_ (visualizzarle con un istogramma)
+  - emoji più **frequenti** nei tweet (graficamente visualizzate con una word cloud)
+  - emoticons più **frequenti** nei tweet (graficamente visualizzate con una word cloud)
+  - hashtags più **frequenti** nei tweet
+  - la percentuale delle parole delle risorse lessicali presenti nei tweets: _perc_persence_lex_words(X,Y)_ (visualizzarle con un istogramma)
   - raccogliere le parole nuove presenti nei tweets ma non nelle risorse lessicali (_N_twitter_words(Y)- N_shared_words(X,Y)_)
-##### Schema di *twitter_words*
+##### Schema di *token_twitter*
+###### MongoDB
 Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:  
 ````
 {
@@ -57,6 +67,15 @@ Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:
 }
 ````
 a cui verrà aggiunto il campo `quant` (quantità del lemma trovato)
+###### MySQL 
+> parola
+![](res/immagini_readme/parola_contenuta_table_schema.png)
+> emoji
+
+> emoticon
+
+> hashtag
+
 #### eventualmente nuova risorsa su DB
  Memorizzare le _nuove parole_ trovate nei tweet ma assenti nelle risorse fornite (se alla fine del conteggio saranno altamente presenti avremo trovato nuova parole da aggiungere alle risorse o avremo creato una risorsa  aggiuntiva!)
 ![image](https://user-images.githubusercontent.com/43850400/118098215-ea947000-b3d3-11eb-9a94-4d41571c25f8.png)
@@ -75,7 +94,7 @@ URL : indica un url.
 Altri tag potrei cercarli con uno script python
 ## Osservazioni su Risorse lessicali emozioni
 Ricordiamo il modello delle emozioni che dobbiamo considerare nel progetto
-![image](res\emotion_model.png)
+![image](res/immagini_readme/emotion_model.png)
 
 Adesso vediamo invece come sono organizzate le risorse a disposizione:
 - Ogni cartella contiene risorse su una determinata **emozione** ad eccezione di:
@@ -105,7 +124,7 @@ Adesso vediamo invece come sono organizzate le risorse a disposizione:
     
 Quelle in grassetto sono le emozioni presenti anche nei file di `Twitter messaggi` col seguente formato `dataset_dt_<emozione.lower()>_60k.txt`
 ### Descrizione risorse
-![image](res\lexica_organization.png)
+![image](res/immagini_readme/lexica_organization.png)
 - **EmoSN**: EmoSenticNet includes 13,189 entries for the six Ekman’s emotions of Joy, Sadness, Anger, Fear, Surprise and Disgust. The resource was developed by assigning WordNet Affect emotion labels to SenticNet concepts [Poria et al. 2013; Poria et al. 2014]. The last one is a list of common-sense knowledge concepts with a polarity score [Cambria et al. 2014] referring to the multidisciplinary approach of Sentic Computing [Cambria and Hussain 2015].
 - **SS**: SentiSense is a concept-based affective lexicon with a wide set of categories developed by Carrillo de Albornoz [Carrillo de Albornoz et al. 2012], including 5,496 words and 2,190 synsets from WordNet, labeled with an emotion from a set of 14 categories.
 - ANEW: The dictionary Affective Norms for English Words includes terms rated from 1 to 9 for each of the three dimensions of Valence, Arousal and Dominance.
