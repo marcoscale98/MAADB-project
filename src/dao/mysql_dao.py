@@ -3,14 +3,15 @@ from typing import Union, List
 
 import math
 from mysql.connector.cursor import CursorBase
-from pymongo.database import Database
 
 from src.dao.dao import DAO
 
 import mysql.connector
-from mysql.connector import errorcode, MySQLConnection
+from mysql.connector import errorcode, MySQLConnection, IntegrityError
 
 from src.config import *
+from src.dao.nomi_db_emozioni import Nomi_db_mysql
+
 
 class MySQLDAO(DAO):
     def __init__(self, url=None):
@@ -44,15 +45,21 @@ class MySQLDAO(DAO):
         cursor=conn.cursor()
         if drop_if_not_empty:
             self._drop_if_not_empty(cursor,"risorsa_lessicale")
-        query='INSERT INTO risorsa_lessicale (risorsa, emozione, parola) VALUES (%s,%s,%s)'
-        lemmi_map=[]
+        parole_per_ris_les=[]
+        parole=[]
         for lemma in lemmi:
             resources = lemma['res'].keys()
+            parole.append((lemma['lemma'],))
             for res in resources:
-                lemmi_map.append((res,emozione,lemma['lemma']))
-        cursor.executemany(query,lemmi_map)
+                parole_per_ris_les.append((res,emozione,lemma['lemma']))
+        self.insert_parole_in_ris_les(cursor, parole_per_ris_les)
+        self.insert_parole(cursor,parole)
         self._disconnect(conn)
-        return len(lemmi_map)
+        return len(parole_per_ris_les)
+
+    def insert_parole_in_ris_les(self, cursor, parole_per_ris_les):
+        query = f'INSERT INTO {Nomi_db_mysql.RISORSA_LESSICALE.value} (risorsa, emozione, parola) VALUES (%s,%s,%s)'
+        cursor.executemany(query, parole_per_ris_les)
 
     def chunk_by_size(self,lst:List, size:int):
             n = math.ceil(len(lst) / size)
@@ -67,7 +74,7 @@ class MySQLDAO(DAO):
             self._drop_if_not_empty(cursor, "messaggio_twitter")
         for chuck in chunkes:
             data = list(map(lambda message: (message, emozione), chuck))
-            query="INSERT INTO messaggio_twitter (messaggio,emozione) VALUES (%s,%s)"
+            query=f"INSERT INTO {Nomi_db_mysql.MESSAGGIO_TWITTER.value} (messaggio,emozione) VALUES (%s,%s)"
             cursor.executemany(query,data)
         self._disconnect(conn)
         return len(messages)
@@ -87,3 +94,11 @@ class MySQLDAO(DAO):
     def _drop_if_not_empty(self, cursor: CursorBase, table: str):
         query='TRUNCATE ' + table
         cursor.execute(query)
+
+    def insert_parole(self, cursor, parole):
+        try:
+            query=f'INSERT INTO {Nomi_db_mysql.PAROLA.value} (parola) VALUES (%s)'
+            cursor.executemany(query,parole)
+        except IntegrityError:
+            pass
+

@@ -3,7 +3,7 @@ import timeit
 
 from src.dao.mongodb_dao import MongoDBDAO
 from src.dao.mysql_dao import MySQLDAO
-from src.dao.nomi_db_emozioni import Emotions, Nomi_db
+from src.dao.nomi_db_emozioni import Emotions, Nomi_db_mongo
 from src.preprocessing_text import *
 
 
@@ -93,5 +93,5 @@ if __name__ == '__main__':
     DROP = True
     # dao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
     dao = MySQLDAO('jdbc:mysql://localhost:3306?serverTimezone=UTC')
-    # populate_db_lexres(dao,DROP)
-    populate_db_twitter(dao, DROP)
+    populate_db_lexres(dao,DROP)
+    # populate_db_twitter(dao, DROP)
