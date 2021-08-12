@@ -1,5 +1,5 @@
 import os
-from typing import Union
+from typing import Union, Optional, Generator
 
 from pymongo import MongoClient
 from pymongo.collection import Collection
@@ -98,6 +98,20 @@ class MongoDBDAO(DAO):
         if emot_coll.count_documents({}) > 0:
             emot_coll.drop()
         self._disconnect(database)
+
+    def download_messaggi_twitter(self, emozione: Optional[str]) -> Generator:
+        min = 0
+        max = 100
+        while True:
+            db = self._connect(Nomi_db_mongo.MESSAGGIO_TWITTER.value)
+            emozione_coll=db[emozione]
+            cursor=emozione_coll.find({'_id': {'$gte': min}, '_id':{'$lt':max}})
+            messaggi = list(cursor)
+            self._disconnect(db)
+            min += 100
+            max += 100
+            for mess in messaggi:
+                yield mess
 
 
 if __name__ == '__main__':

@@ -122,4 +122,5 @@ class MySQLDAO(DAO):
             self._disconnect(conn)
             min+=100
             max+=100
-            yield messaggi
+            for mess in messaggi:
+                yield mess
