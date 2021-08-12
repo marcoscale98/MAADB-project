@@ -37,8 +37,6 @@ class MongoDBDAO(DAO):
         if drop_if_not_empty:
             self.drop_if_not_empty(Nomi_db_mongo.RISORSA_LESSICALE.value, emozione)
         num = lex_res_db[emozione].insert_many(lemmi)
-        print(f'N. documenti inseriti nella collezione {lex_res_db[emozione].name}: {len(num.inserted_ids)}')
-        print(f'n. documenti presenti nella collezione {lex_res_db[emozione].name}: {lex_res_db[emozione].count_documents({})}')
         self._disconnect(lex_res_db)
         return num.inserted_ids
 
@@ -99,7 +97,7 @@ class MongoDBDAO(DAO):
             emot_coll.drop()
         self._disconnect(database)
 
-    def download_messaggi_twitter(self, emozione: Optional[str]) -> Generator:
+    def download_messaggi_twitter(self, emozione: Optional[str]='anger') -> Generator:
         min = 0
         max = 100
         while True:
@@ -110,6 +108,9 @@ class MongoDBDAO(DAO):
             self._disconnect(db)
             min += 100
             max += 100
+            if len(messaggi)==0:
+                print("Messaggi finiti")
+                return
             for mess in messaggi:
                 yield mess
 

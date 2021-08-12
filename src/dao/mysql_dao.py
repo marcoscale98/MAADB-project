@@ -111,16 +111,14 @@ class MySQLDAO(DAO):
             pass
 
     def download_messaggi_twitter(self, emozione: Optional[str]) -> Generator:
-        min=0
-        max=100
-        while True:
-            conn=self._connect()
-            cursor=conn.cursor()
-            query=f'SELECT * FROM {Nomi_db_mysql.MESSAGGIO_TWITTER.value} WHERE "id>={min} AND id<{max}"'
+        conn=self._connect()
+        cursor=conn.cursor()
+        query=f'SELECT * FROM {Nomi_db_mysql.MESSAGGIO_TWITTER.value}'
+        if emozione is not None:
+            query += " WHERE emozione=%s"
+            data=(emozione,)
+            cursor.execute(query,data)
+        else:
             cursor.execute(query)
-            messaggi=cursor.fetchall()
-            self._disconnect(conn)
-            min+=100
-            max+=100
-            for mess in messaggi:
-                yield mess
+        for messaggio in cursor:
+            yield messaggio

@@ -38,7 +38,8 @@ def populate_db_lexres(dao,drop_if_not_empty):
             except FileNotFoundError:
                 pass
         lemmi = list(map(lambda kv: {"lemma": kv[0], "res": kv[1]}, lemmi.items()))
-        dao.upload_lemmi_of_lexres(em, lemmi,drop_if_not_empty)
+        res_insert=dao.upload_lemmi_of_lexres(em, lemmi,drop_if_not_empty)
+        print(f'Inseriti {res_insert} lemmi dell\'emozione {em}')
 
 
 def populate_db_twitter(dao, drop_if_not_empty):
@@ -46,6 +47,7 @@ def populate_db_twitter(dao, drop_if_not_empty):
     inseriamo nella `backup_twitter_messages` database una collezione per ogni file txt
     :return:
     '''
+    n=True
     for em in Emotions:
         em = em.value
         path = f'res/Twitter_messaggi/dataset_dt_{em}_60k.txt'
@@ -58,6 +60,8 @@ def populate_db_twitter(dao, drop_if_not_empty):
                 messages.append(mess)
                 mess = fp.readline()
         res_insert = dao.upload_twitter_messages(em, messages, drop_if_not_empty)
+        if n and isinstance(dao,MySQLDAO) :
+            drop_if_not_empty=False
         print(f'Inseriti {res_insert} messaggi dell\'emozione {em}')
 
 
@@ -89,9 +93,15 @@ def populate_db_twitter(dao, drop_if_not_empty):
 #             upload_words(emoticons, emotion, "emoticon")
 #
 #
+def test_get_messaggi(dao):
+    emozione='anger'
+    gen=dao.download_messaggi_twitter(emozione)
+    for mess in gen:
+        print(mess)
 if __name__ == '__main__':
     DROP = True
     # dao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
     dao = MySQLDAO('jdbc:mysql://localhost:3306?serverTimezone=UTC')
-    populate_db_lexres(dao,DROP)
+    # populate_db_lexres(dao,DROP)
     # populate_db_twitter(dao, DROP)
+    test_get_messaggi(dao)
