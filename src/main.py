@@ -93,15 +93,17 @@ def populate_db_twitter(dao, drop_if_not_empty):
 #             upload_words(emoticons, emotion, "emoticon")
 #
 #
-def test_get_messaggi(dao):
-    emozione='anger'
+def test_get_messaggi(dao,emozione=None):
+    if emozione is None:
+        emozione='anger'
     gen=dao.download_messaggi_twitter(emozione)
     for mess in gen:
         print(mess)
+
 if __name__ == '__main__':
     DROP = True
-    # dao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
-    dao = MySQLDAO('jdbc:mysql://localhost:3306?serverTimezone=UTC')
+    dao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
+    # dao = MySQLDAO('jdbc:mysql://localhost:3306?serverTimezone=UTC')
     # populate_db_lexres(dao,DROP)
     # populate_db_twitter(dao, DROP)
     test_get_messaggi(dao)

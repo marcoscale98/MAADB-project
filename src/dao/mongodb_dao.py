@@ -38,7 +38,7 @@ class MongoDBDAO(DAO):
             self.drop_if_not_empty(Nomi_db_mongo.RISORSA_LESSICALE.value, emozione)
         num = lex_res_db[emozione].insert_many(lemmi)
         self._disconnect(lex_res_db)
-        return num.inserted_ids
+        return len(num.inserted_ids)
 
     def upload_twitter_messages(self,emozione:str, messages, drop_if_not_empty:bool):
         messages = list(map(lambda m: {"message": m}, messages))
@@ -46,10 +46,8 @@ class MongoDBDAO(DAO):
         if drop_if_not_empty:
             self.drop_if_not_empty(Nomi_db_mongo.RISORSA_LESSICALE.value, emozione)
         num = twitter_db[emozione].insert_many(messages)
-        print(f'N. documenti inseriti nella collezione {twitter_db[emozione].name}: {len(num.inserted_ids)}')
-        print(f'n. documenti presenti nella collezione {twitter_db[emozione].name}: {twitter_db[emozione].count_documents({})}')
         self._disconnect(twitter_db)
-        return num.inserted_ids
+        return len(num.inserted_ids)
 
     def upload_words(self, words: list[Union[str,dict]], emotion: str, tipo: str = 'word', drop_if_not_empty: bool =False):
         twitter_words_db = self._connect(Nomi_db_mongo.TOKEN_TWITTER.value)
@@ -60,10 +58,9 @@ class MongoDBDAO(DAO):
             raise Exception('tipo not in ("word","hashtag","emoji","emoticon")')
 
         words = list(map(lambda word: self._add_type(word, tipo), words))
-        result = emot_coll[emotion].insert_many(words)
-        if DEBUG:
-            print(f'Inseriti {len(result.inserted_ids)} {tipo} in {twitter_words_db.name}.{emot_coll.name}')
+        risultati = emot_coll[emotion].insert_many(words)
         self._disconnect(twitter_words_db)
+        return len(risultati)
 
     def _add_type(self,word, tipo):
         if type(word)==str:
@@ -76,13 +73,13 @@ class MongoDBDAO(DAO):
         return word
 
     def upload_emoji(self,emoji, emotion):
-        self.upload_words(emoji, emotion, "emoji")
+        return self.upload_words(emoji, emotion, "emoji")
 
     def upload_emoticons(self,emoticons, emotion):
-        self.upload_words(emoticons, emotion, "emoticon")
+        return self.upload_words(emoticons, emotion, "emoticon")
 
     def upload_hashtags(self,hashtags, emotion):
-        self.upload_words(hashtags, emotion, 'hashtag')
+        return self.upload_words(hashtags, emotion, 'hashtag')
 
     def drop_words_collection(self,emotion):
         words_db = self._connect(Nomi_db_mongo.TOKEN_TWITTER.value)
@@ -103,7 +100,7 @@ class MongoDBDAO(DAO):
         while True:
             db = self._connect(Nomi_db_mongo.MESSAGGIO_TWITTER.value)
             emozione_coll=db[emozione]
-            cursor=emozione_coll.find({'_id': {'$gte': min}, '_id':{'$lt':max}})
+            cursor=emozione_coll.find()[min:max]
             messaggi = list(cursor)
             self._disconnect(db)
             min += 100
