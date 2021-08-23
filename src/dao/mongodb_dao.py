@@ -6,7 +6,7 @@ from pymongo.database import Database
 
 from src.dao.dao import DAO
 
-from src.dao.utils.nomi_db_emozioni import Nomi_db_mongo
+from src.utils.nomi_db_emozioni import Nomi_db_mongo
 
 
 class MongoDBDAO(DAO):

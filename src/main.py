@@ -2,7 +2,7 @@ import os
 
 from src.dao.mongodb_dao import MongoDBDAO
 from src.dao.mysql_dao import MySQLDAO
-from src.dao.utils.nomi_db_emozioni import Emotions
+from src.utils.nomi_db_emozioni import Emotions
 
 
 def populate_db_lexres(dao,drop_if_not_empty):

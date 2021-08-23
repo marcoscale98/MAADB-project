@@ -9,8 +9,7 @@ from src.dao.dao import DAO
 import mysql.connector
 from mysql.connector import errorcode, MySQLConnection, IntegrityError
 
-from src.dao.utils.config import *
-from src.dao.utils.nomi_db_emozioni import Nomi_db_mysql
+from src.utils.nomi_db_emozioni import Nomi_db_mysql
 
 
 class MySQLDAO(DAO):
