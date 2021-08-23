@@ -75,9 +75,9 @@ def test_connessione(dao):
 
 if __name__ == '__main__':
     DROP = True
-    dao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
-    # dao = MySQLDAO('jdbc:mysql://localhost:3306?serverTimezone=UTC')
-    # populate_db_lexres(dao,DROP)
-    populate_db_twitter(dao, DROP)
+    # dao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
+    dao = MySQLDAO('jdbc:mysql://localhost:3306?serverTimezone=UTC')
+    populate_db_lexres(dao,DROP)
+    # populate_db_twitter(dao, DROP)
     # test_get_messaggi(dao)
     # test_connessione(dao)

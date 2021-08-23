@@ -44,7 +44,7 @@ class MySQLDAO(DAO):
         conn: MySQLConnection = self._connect()
         cursor = conn.cursor()
         if drop_if_not_empty:
-            self._drop_if_not_empty(cursor, Nomi_db_mysql.RISORSA_LESSICALE.value)
+            self._drop_if_not_empty(cursor, Nomi_db_mysql.RISORSA_LESSICALE.value, emozione)
         parole_per_ris_les = []
         parole = []
         for lemma in lemmi:
@@ -71,7 +71,7 @@ class MySQLDAO(DAO):
         cursor = conn.cursor()
         chunkes = self._chunk_by_size(messages, 1000)
         if drop_if_not_empty:
-            self._drop_if_not_empty(cursor, Nomi_db_mysql.MESSAGGIO_TWITTER.value)
+            self._drop_if_not_empty(cursor, Nomi_db_mysql.MESSAGGIO_TWITTER.value, emozione)
         for chuck in chunkes:
             data = list(map(lambda message: (message, emozione), chuck))
             query = f"INSERT INTO {Nomi_db_mysql.MESSAGGIO_TWITTER.value} (messaggio,emozione) VALUES (%s,%s)"
@@ -101,8 +101,8 @@ class MySQLDAO(DAO):
         tokens_upload= list(map(lambda token: (token,emotion), tokens))
         cursor.executemany(tokens,query)
 
-    def _drop_if_not_empty(self, cursor: CursorBase, table: str):
-        query = 'TRUNCATE ' + table
+    def _drop_if_not_empty(self, cursor: CursorBase, table: str, emozione:str=None):
+        query = 'delete from ' + table + ' where emozione=\'' + emozione +"'"
         cursor.execute(query)
 
     def _insert_parole(self, cursor, parole):
