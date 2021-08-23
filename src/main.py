@@ -39,7 +39,7 @@ def populate_db_lexres(dao,drop_if_not_empty):
         res_insert=dao.upload_lemmi_of_lexres(em, lemmi,drop_if_not_empty)
         print(f'Inseriti {res_insert} lemmi dell\'emozione {em}')
 
-def populate_db_twitter(dao, drop_if_not_empty):
+def populate_db_twitter(dao, drop_if_not_empty:bool=False):
     '''
     inseriamo nella `backup_twitter_messages` database una collezione per ogni file txt
     :return:
@@ -78,6 +78,6 @@ if __name__ == '__main__':
     dao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
     # dao = MySQLDAO('jdbc:mysql://localhost:3306?serverTimezone=UTC')
     # populate_db_lexres(dao,DROP)
-    # populate_db_twitter(dao, DROP)
+    populate_db_twitter(dao, DROP)
     # test_get_messaggi(dao)
-    test_connessione(dao)
+    # test_connessione(dao)

@@ -9,6 +9,7 @@ from src.dao.dao import DAO
 import mysql.connector
 from mysql.connector import errorcode, MySQLConnection, IntegrityError
 
+from src.utils.config import MYSQL_CONFIG
 from src.utils.nomi_db_emozioni import Nomi_db_mysql
 
 
@@ -51,24 +52,24 @@ class MySQLDAO(DAO):
             parole.append((lemma['lemma'],))
             for res in resources:
                 parole_per_ris_les.append((res, emozione, lemma['lemma']))
-        self.insert_parole_in_ris_les(cursor, parole_per_ris_les)
-        self.insert_parole(cursor, parole)
+        self._insert_parole_in_ris_les(cursor, parole_per_ris_les)
+        self._insert_parole(cursor, parole)
         self._disconnect(conn)
         return len(parole_per_ris_les)
 
-    def insert_parole_in_ris_les(self, cursor, parole_per_ris_les):
+    def _insert_parole_in_ris_les(self, cursor, parole_per_ris_les):
         query = f'INSERT INTO {Nomi_db_mysql.RISORSA_LESSICALE.value} (risorsa, emozione, parola) VALUES (%s,%s,%s)'
         cursor.executemany(query, parole_per_ris_les)
 
-    def chunk_by_size(self, lst: List, size: int):
+    def _chunk_by_size(self, lst: List, size: int):
         n = math.ceil(len(lst) / size)
         return list(map(lambda x: lst[x * size:x * size + size], list(range(n))))
 
-    def upload_twitter_messages(self, emozione: str, messages: list, drop_if_not_empty: bool):
+    def upload_twitter_messages(self, emozione: str, messages: list, drop_if_not_empty: bool=False):
         conn: MySQLConnection = self._connect()
         # faccio upload dei messaggi twitter
         cursor = conn.cursor()
-        chunkes = self.chunk_by_size(messages, 1000)
+        chunkes = self._chunk_by_size(messages, 1000)
         if drop_if_not_empty:
             self._drop_if_not_empty(cursor, Nomi_db_mysql.MESSAGGIO_TWITTER.value)
         for chuck in chunkes:
@@ -81,6 +82,7 @@ class MySQLDAO(DAO):
     def upload_words(self, words: List[Union[str, dict]], emotion: str):
         query = f'INSERT INTO {Nomi_db_mysql.PAROLA_CONTENUTA.value} (parola,emozione) values (%s,%s)'
         self.upload_tokens(words, emotion, query)
+
     def upload_emoji(self, emoji, emotion):
         query=f'INSERT INTO {Nomi_db_mysql.EMOJI_CONTENUTA.value} (emoji,emozione) values (%s,%s)'
         self.upload_tokens(emoji, emotion, query)
@@ -98,11 +100,12 @@ class MySQLDAO(DAO):
         cursor=conn.cursor()
         tokens_upload= list(map(lambda token: (token,emotion), tokens))
         cursor.executemany(tokens,query)
+
     def _drop_if_not_empty(self, cursor: CursorBase, table: str):
         query = 'TRUNCATE ' + table
         cursor.execute(query)
 
-    def insert_parole(self, cursor, parole):
+    def _insert_parole(self, cursor, parole):
         try:
             query = f'INSERT INTO {Nomi_db_mysql.PAROLA.value} (parola) VALUES (%s)'
             cursor.executemany(query, parole)

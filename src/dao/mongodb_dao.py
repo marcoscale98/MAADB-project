@@ -35,7 +35,7 @@ class MongoDBDAO(DAO):
     def upload_lemmi_of_lexres(self, emozione:str, lemmi, drop_if_not_empty:bool):
         lex_res_db = self._connect(Nomi_db_mongo.RISORSA_LESSICALE.value)
         if drop_if_not_empty:
-            self.drop_if_not_empty(Nomi_db_mongo.RISORSA_LESSICALE.value, emozione)
+            self._drop_if_not_empty(Nomi_db_mongo.RISORSA_LESSICALE.value, emozione)
         num = lex_res_db[emozione].insert_many(lemmi)
         self._disconnect(lex_res_db)
         return len(num.inserted_ids)
@@ -44,7 +44,7 @@ class MongoDBDAO(DAO):
         messages = list(map(lambda m: {"message": m}, messages))
         twitter_db = self._connect(Nomi_db_mongo.MESSAGGIO_TWITTER.value)
         if drop_if_not_empty:
-            self.drop_if_not_empty(Nomi_db_mongo.RISORSA_LESSICALE.value, emozione)
+            self._drop_if_not_empty(Nomi_db_mongo.MESSAGGIO_TWITTER.value, emozione)
         num = twitter_db[emozione].insert_many(messages)
         self._disconnect(twitter_db)
         return len(num.inserted_ids)
@@ -52,7 +52,7 @@ class MongoDBDAO(DAO):
     def upload_words(self, words: list[Union[str,dict]], emotion: str, tipo: str = 'word', drop_if_not_empty: bool =False):
         twitter_words_db = self._connect(Nomi_db_mongo.TOKEN_TWITTER.value)
         if drop_if_not_empty:
-            self.drop_if_not_empty(Nomi_db_mongo.TOKEN_TWITTER.value, emotion)
+            self._drop_if_not_empty(Nomi_db_mongo.TOKEN_TWITTER.value, emotion)
         emot_coll: Collection = twitter_words_db[emotion]
         if tipo not in ("word", 'hashtag', 'emoji', 'emoticon'):
             raise Exception('tipo not in ("word","hashtag","emoji","emoticon")')
@@ -81,16 +81,17 @@ class MongoDBDAO(DAO):
     def upload_hashtags(self,hashtags, emotion):
         return self.upload_words(hashtags, emotion, 'hashtag')
 
-    def drop_words_collection(self,emotion):
+    def _drop_words_collection(self, emotion):
         words_db = self._connect(Nomi_db_mongo.TOKEN_TWITTER.value)
         words_coll = words_db[emotion]
         words_coll.drop()
         self._disconnect(words_db)
 
-    def drop_if_not_empty(self, db: str, emozione: str):
+    def _drop_if_not_empty(self, db: str, emozione: str):
         database = self._connect(db)
         emot_coll = database[emozione]
-        if emot_coll.count_documents({}) > 0:
+        count=emot_coll.count_documents({})
+        if count > 0:
             emot_coll.drop()
         self._disconnect(database)
 
