@@ -3,6 +3,7 @@ from typing import Union, Optional, Generator
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
+from pymongo.results import InsertManyResult
 
 from src.dao.dao import DAO
 
@@ -49,37 +50,41 @@ class MongoDBDAO(DAO):
         self._disconnect(twitter_db)
         return len(num.inserted_ids)
 
-    def upload_words(self, words: list[Union[str,dict]], emotion: str, tipo: str = 'word', drop_if_not_empty: bool =False):
+    def _upload_tokens(self, words: list[Union[str, dict]], emotion: str, tipo: str = 'parola', drop_if_not_empty: bool =False):
         twitter_words_db = self._connect(Nomi_db_mongo.TOKEN_TWITTER.value)
         if drop_if_not_empty:
             self._drop_if_not_empty(Nomi_db_mongo.TOKEN_TWITTER.value, emotion)
         emot_coll: Collection = twitter_words_db[emotion]
-        if tipo not in ("word", 'hashtag', 'emoji', 'emoticon'):
-            raise Exception('tipo not in ("word","hashtag","emoji","emoticon")')
+        if tipo not in ("parola", 'hashtag', 'emoji', 'emoticon'):
+            raise Exception('tipo not in ("parola","hashtag","emoji","emoticon")')
 
-        words = list(map(lambda word: self._add_type(word, tipo), words))
-        risultati = emot_coll[emotion].insert_many(words)
+        if type(words[0]) == str:
+            words = list(map(lambda parola: self._add_type(parola, tipo), words))
+        risultati :InsertManyResult = emot_coll.insert_many(words)
         self._disconnect(twitter_words_db)
-        return len(risultati)
+        return len(risultati.inserted_ids)
 
-    def _add_type(self,word, tipo):
-        if type(word)==str:
-            word= {
-                'token':word,
+    def _add_type(self,parola, tipo):
+        if type(parola)==str:
+            parola= {
+                'token':parola,
                 'tipo':tipo,
             }
         else:
-            word['tipo'] = tipo
-        return word
+            parola['tipo'] = tipo
+        return parola
+
+    def upload_words(self, words: list[Union[str,dict]], emotion: str, drop_if_not_empty: bool =False):
+        return self._upload_tokens(words, emotion, "parola")
 
     def upload_emoji(self,emoji, emotion):
-        return self.upload_words(emoji, emotion, "emoji")
+        return self._upload_tokens(emoji, emotion, "emoji")
 
     def upload_emoticons(self,emoticons, emotion):
-        return self.upload_words(emoticons, emotion, "emoticon")
+        return self._upload_tokens(emoticons, emotion, "emoticon")
 
     def upload_hashtags(self,hashtags, emotion):
-        return self.upload_words(hashtags, emotion, 'hashtag')
+        return self._upload_tokens(hashtags, emotion, 'hashtag')
 
     def _drop_words_collection(self, emotion):
         words_db = self._connect(Nomi_db_mongo.TOKEN_TWITTER.value)

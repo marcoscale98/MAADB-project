@@ -80,26 +80,31 @@ class MySQLDAO(DAO):
         return len(messages)
 
     def upload_words(self, words: List[Union[str, dict]], emotion: str):
-        query = f'INSERT INTO {Nomi_db_mysql.PAROLA_CONTENUTA.value} (parola,emozione) values (%s,%s)'
-        self.upload_tokens(words, emotion, query)
+        query = f'INSERT INTO {Nomi_db_mysql.PAROLA_CONTENUTA.value} (parola,emozione,quantita) values (%s,%s,%s)'
+        self._upload_tokens(words, emotion, query)
+        return len(words)
 
     def upload_emoji(self, emoji, emotion):
-        query=f'INSERT INTO {Nomi_db_mysql.EMOJI_CONTENUTA.value} (emoji,emozione) values (%s,%s)'
-        self.upload_tokens(emoji, emotion, query)
+        query=f'INSERT INTO {Nomi_db_mysql.EMOJI_CONTENUTA.value} (emoji,emozione,quantita) values (%s,%s,%s)'
+        self._upload_tokens(emoji, emotion, query)
+        return len(emoji)
 
     def upload_emoticons(self, emoticons, emotion):
-        query=f'INSERT INTO {Nomi_db_mysql.EMOTICON_CONTENUTA.value} (emoticon,emozione) values (%s,%s)'
-        self.upload_tokens(emoticons, emotion, query)
+        query=f'INSERT INTO {Nomi_db_mysql.EMOTICON_CONTENUTA.value} (emoticon,emozione,quantita) values (%s,%s,%s)'
+        self._upload_tokens(emoticons, emotion, query)
+        return len(emoticons)
 
     def upload_hashtags(self, hashtags, emotion):
-        query=f'INSERT INTO {Nomi_db_mysql.HASHTAG_CONTENUTO.value} (hashtag,emozione) values (%s,%s)'
-        self.upload_tokens(hashtags, emotion,query)
+        query=f'INSERT INTO {Nomi_db_mysql.HASHTAG_CONTENUTO.value} (hashtag,emozione,quantita) values (%s,%s,%s)'
+        self._upload_tokens(hashtags, emotion, query)
+        return len(hashtags)
 
-    def upload_tokens(self,tokens,emotion, query):
+    def _upload_tokens(self, tokens, emotion,query, quant=1 ):
         conn=self._connect()
         cursor=conn.cursor()
-        tokens_upload= list(map(lambda token: (token,emotion), tokens))
-        cursor.executemany(tokens,query)
+        tokens_upload= list(map(lambda token: (token,emotion, quant), tokens))
+        cursor.executemany(query, tokens_upload)
+        return len(tokens)
 
     def _drop_if_not_empty(self, cursor: CursorBase, table: str, emozione:str=None):
         query = 'delete from ' + table + ' where emozione=\'' + emozione +"'"

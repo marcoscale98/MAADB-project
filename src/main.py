@@ -3,7 +3,7 @@ import os
 from src.dao.mongodb_dao import MongoDBDAO
 from src.dao.mysql_dao import MySQLDAO
 from src.utils.nomi_db_emozioni import Emotions
-
+from src.preprocessing_text import preprocessing_text
 
 def populate_db_lexres(dao,drop_if_not_empty):
     # inseriamo nel database `buffer_lexical_resources` una collezione per ogni emozione
@@ -73,11 +73,39 @@ def test_connessione(dao):
     if res:
         print("Connessione avvenuta con successo")
 
+def insert_tokens(dao):
+    #todo da terminare
+    messaggi=dao.download_messaggi_twitter(emozione='anger')
+    messaggi=list(map(lambda messaggio: messaggio['message'],messaggi))
+    tweet_preprocessati=preprocessing_text.preprocessing_text((messaggio for messaggio in messaggi))
+    print()
+
+def test_insert_parola(dao):
+    res=dao.upload_words(["parola"],"anger")
+    print(f"Inserito {res} parole")
+
+def test_insert_hashtag(dao):
+    res=dao.upload_hashtags(["#hashtag"],'anger')
+    print(f"Inserito {res} hashtags")
+
+def test_insert_emoji(dao):
+    res=dao.upload_emoji(['😀'],'anger')
+    print(f'Inseriti {res} emoji')
+
+def test_insert_emoticon(dao):
+    res=dao.upload_emoticons([':)'],'anger')
+    print(f'Inseriti {res} emoticon')
+
+
 if __name__ == '__main__':
     DROP = True
     # dao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
     dao = MySQLDAO('jdbc:mysql://localhost:3306?serverTimezone=UTC')
-    populate_db_lexres(dao,DROP)
+    # populate_db_lexres(dao,DROP)
     # populate_db_twitter(dao, DROP)
     # test_get_messaggi(dao)
     # test_connessione(dao)
+    test_insert_parola(dao)
+    test_insert_emoticon(dao)
+    test_insert_emoji(dao)
+    test_insert_hashtag(dao)

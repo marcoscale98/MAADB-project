@@ -5,6 +5,19 @@ Python 3.9
 ## Schema di lavoro
 [Descrizione progetto](https://docs.google.com/document/d/1i3TSJpyr4vw-edKBX1XNuy52f8_Sem0aPWmo6fBpuBs/edit?ts=57308c63#heading=h.oublcismo327)
 ### Cosa c'è da creare?
+#### Pipeline di preprocessing dei tweets
+
+##### Oggetto di output
+````
+{
+  "id":i,
+  "frase_ripulita": str,
+  "hashtags":list(str),
+  "emoticons":list(str),
+  "emojis":list(str),
+  'parola':str
+}
+````
 #### Database di buffer
  Database dove mantenere le risorse lessicali e i messaggi di twitter (questi poi verranno recuperati come uno stream teoricamente infinito di dati)
 ##### Schema di *messaggio_twitter*

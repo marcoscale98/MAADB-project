@@ -38,17 +38,16 @@ def preprocessing_text(frasi: Generator) -> dict[int, dict[str, Union[int, str, 
     - [x] trasformare tutto a lower case
 
     :param frase:
-    :return: preprocessed_text (es. {'word':'dog','lemma':'dog','pos':'NOUN'}), lista hashtag trovati, lista emoji trovate, lista emoticons trovate
+    :return: preprocessed_text (es. {'token':'dog','lemma':'dog','pos':'NOUN'}), lista hashtag trovati, lista emoji trovate, lista emoticons trovate
     '''
     tweets_analizzati= dict()
     i=0
     for frase in frasi:
         emoticons, frase, hashtags, list_emojis = primo_processing(frase)
         tweets_analizzati[i]={"id":i, "frase_ripulita": frase,"hashtags":hashtags,"emoticons":emoticons,"emojis":list_emojis}
-
         i+=1
 
-    frasi_tokenizzate:Generator = spacy_processing((tweet["frase_ripulita"] for tweet in tweets_analizzati.values())) ##parte più costosa
+    frasi_tokenizzate:Generator = spacy_processing((tweet["frase_ripulita"] for tweet in tweets_analizzati.values())) # parte più costosa
     i=0
     for list_token in frasi_tokenizzate:
         parole_senza_punteggiatura = secondo_processing(list_token)
@@ -59,7 +58,7 @@ def preprocessing_text(frasi: Generator) -> dict[int, dict[str, Union[int, str, 
 def secondo_processing(list_token):
     nuovi_tokens = slang_words_processing(list_token)
     # remove stop words
-    without_stop_words = [t for t in nuovi_tokens if t['word'] not in stopwords.words('english')]
+    without_stop_words = [t for t in nuovi_tokens if t['token'] not in stopwords.words('english')]
     # remuove punteggiatura, parole mal formate e eventuali caratteri speciali
     parole_senza_punteggiatura = [t for t in without_stop_words if t['pos'] not in {'SPACE', 'SYM', 'PUNCT', 'X'}]
     # tutto lower
@@ -81,12 +80,12 @@ def slang_words_processing(tokens):
     #       se lo è lo sostituisco con la forma estesa tokenizzata
     nuovi_tokens = []
     for t in tokens:
-        forma_estesa = slang_words.get(t['word'])
+        forma_estesa = slang_words.get(t['token'])
         if forma_estesa is not None:
             doc = nlp(forma_estesa)
             for token in doc:
                 # print(f'{token.text} con lemma {token.lemma_} con pos: {token.pos_}')
-                nuovi_tokens.append({'word': token.text, 'lemma': token.lemma_, 'pos': token.pos_})
+                nuovi_tokens.append({'token': token.text, 'lemma': token.lemma_, 'pos': token.pos_})
         else:
             nuovi_tokens.append(t)
     return nuovi_tokens
@@ -98,7 +97,7 @@ def spacy_processing(frasi: Generator) -> Generator:
     def extract_token(doc):
         tokens = []
         for token in doc:
-            tokens.append({'word': token.text, 'lemma': token.lemma_, 'pos': token.pos_})
+            tokens.append({'token': token.text, 'lemma': token.lemma_, 'pos': token.pos_})
         return tokens
     frasi_processate = (extract_token(doc) for doc in docs)
     return frasi_processate
@@ -126,37 +125,37 @@ def replace_username_url(frase):
     frase = frase.replace("USERNAME", "").replace("URL", "")
     return frase
 
-# if __name__ == '__main__':
-#     nlp = spacy.load('en_core_web_sm', disable=['ner'])
-#     nlp.disable_pipe("parser")
-#     nlp.enable_pipe("senter")
-#     print(nlp.pipe_names)
-#
-#     client = MongoClient()
-#     db = client['buffer_twitter_messages']
-#     coll = db['anger']
-#     db_tokens = client['twitter_words'].drop_collection("anger")
-#     frasi = coll.find({}).limit(60000)
-#     frasi: Generator = (frase['message'] for frase in frasi)
-#     # frasi = [{'message': 'Pen is on the table!'}]
-#     tweet_analizzati = preprocessing_text(frasi)
-#     print("Finito preprocessing")
-#     lista = tweet_analizzati.values()
-#     hashtags = [ogg for sotto_lista in lista for ogg in sotto_lista['hashtags']]
-#     upload_hashtags(hashtags, 'anger')
-#     print(f'Caricati hashtags')
-#     emojis = [ogg for sotto_lista in lista for ogg in sotto_lista['emojis']]
-#     upload_emoji(emojis, 'anger')
-#     print(f'Caricati emojis')
-#     tokens = [ogg for sotto_lista in lista for ogg in sotto_lista['parole']]
-#     upload_words(tokens, 'anger')
-#     print(f'Caricati tokens')
-#     emoticons = [ogg for sotto_lista in lista for ogg in sotto_lista['emoticons']]
-#     upload_emoticons(emoticons, 'anger')
-#     print(f'Caricati emoticons')
-#     if DEBUG:
-#         pprint.pprint(hashtags)
-#         pprint.pp(emoticons)
-#         pprint.pp(emojis)
-#         pprint.pp(tokens)
+if __name__ == '__main__':
+    nlp = spacy.load('en_core_web_sm', disable=['ner'])
+    nlp.disable_pipe("parser")
+    nlp.enable_pipe("senter")
+    print(nlp.pipe_names)
+
+    client = MongoClient()
+    db = client['buffer_twitter_messages']
+    coll = db['anger']
+    db_tokens = client['twitter_words'].drop_collection("anger")
+    frasi = coll.find({}).limit(60000)
+    frasi: Generator = (frase['message'] for frase in frasi)
+    # frasi = [{'message': 'Pen is on the table!'}]
+    tweet_analizzati = preprocessing_text(frasi)
+    print("Finito preprocessing")
+    lista = tweet_analizzati.values()
+    hashtags = [ogg for sotto_lista in lista for ogg in sotto_lista['hashtags']]
+    upload_hashtags(hashtags, 'anger')
+    print(f'Caricati hashtags')
+    emojis = [ogg for sotto_lista in lista for ogg in sotto_lista['emojis']]
+    upload_emoji(emojis, 'anger')
+    print(f'Caricati emojis')
+    tokens = [ogg for sotto_lista in lista for ogg in sotto_lista['parole']]
+    upload_words(tokens, 'anger')
+    print(f'Caricati tokens')
+    emoticons = [ogg for sotto_lista in lista for ogg in sotto_lista['emoticons']]
+    upload_emoticons(emoticons, 'anger')
+    print(f'Caricati emoticons')
+    if DEBUG:
+        pprint.pprint(hashtags)
+        pprint.pp(emoticons)
+        pprint.pp(emojis)
+        pprint.pp(tokens)
 

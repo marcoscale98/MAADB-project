@@ -35,7 +35,7 @@ class DAO:
         '''
         raise InterfaceException
 
-    def upload_words(self, words: List[Union[str, dict]], emotion: str, type: str = 'word'):
+    def upload_words(self, words: List[Union[str, dict]], emotion: str)-> int:
         """
         per fare upload di parole, hashtags, emoji, emoticons
         :param words:
@@ -45,13 +45,13 @@ class DAO:
         """
         raise InterfaceException
 
-    def upload_emoji(self,emoji, emotion):
+    def upload_emoji(self,emoji, emotion)->int:
         raise InterfaceException
 
-    def upload_emoticons(self,emoticons, emotion):
+    def upload_emoticons(self,emoticons, emotion)->int:
         raise InterfaceException
 
-    def upload_hashtags(self,hashtags, emotion):
+    def upload_hashtags(self,hashtags, emotion)->int:
         raise InterfaceException
 
     def download_messaggi_twitter(self,emozione:Optional[str])->Generator:
