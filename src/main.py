@@ -1,10 +1,8 @@
 import os
-import timeit
 
 from src.dao.mongodb_dao import MongoDBDAO
 from src.dao.mysql_dao import MySQLDAO
-from src.dao.nomi_db_emozioni import Emotions, Nomi_db_mongo
-from src.preprocessing_text import *
+from src.dao.utils.nomi_db_emozioni import Emotions
 
 
 def populate_db_lexres(dao,drop_if_not_empty):
@@ -41,7 +39,6 @@ def populate_db_lexres(dao,drop_if_not_empty):
         res_insert=dao.upload_lemmi_of_lexres(em, lemmi,drop_if_not_empty)
         print(f'Inseriti {res_insert} lemmi dell\'emozione {em}')
 
-
 def populate_db_twitter(dao, drop_if_not_empty):
     '''
     inseriamo nella `backup_twitter_messages` database una collezione per ogni file txt
@@ -64,35 +61,6 @@ def populate_db_twitter(dao, drop_if_not_empty):
             drop_if_not_empty=False
         print(f'Inseriti {res_insert} messaggi dell\'emozione {em}')
 
-
-# def test():
-#     client = MongoClient()
-#     #emotion='anger'
-#     Emotions = ('anger', 'anticipation', 'disgust', 'fear', 'joy', 'sadness', 'surprise', 'trust')
-#     messages_db = client['buffer_twitter_messages']
-#     words_db = client['twitter_words']
-#     for emotion in Emotions:
-#         print(timeit.Timer(lambda: test_one_emotion(emotion, messages_db, words_db)).timeit(number=1))
-#
-#
-#
-# def test_one_emotion(emotion, messages_db, words_db):
-#     messages_coll = messages_db[emotion]
-#     drop_words_collection(emotion, words_db)
-#     frasi = messages_coll.find({})
-#     mongodb_dao
-#     for frase in frasi:
-#         words, hashtags, emojis, emoticons = preprocessing_text(frase['message'])
-#         if len(words) > 0:
-#             upload_words(words, emotion)
-#         if len(hashtags) > 0:
-#             upload_words(hashtags, emotion, "hashtag")
-#         if len(emojis) > 0:
-#             upload_words(emojis, emotion, "emoji")
-#         if len(emoticons) > 0:
-#             upload_words(emoticons, emotion, "emoticon")
-#
-#
 def test_get_messaggi(dao,emozione=None):
     if emozione is None:
         emozione='anger'

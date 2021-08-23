@@ -1,24 +1,24 @@
-import os
 from typing import Union, Optional, Generator
 
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
 
-from impostazioni import *
 from src.dao.dao import DAO
 
-from src.dao.nomi_db_emozioni import Nomi_db_mongo, Emotions
+from src.dao.utils.nomi_db_emozioni import Nomi_db_mongo
+
 
 class MongoDBDAO(DAO):
 
     def __init__(self, url):
         super().__init__(url)
 
-    def _connect(self, db:str):
+    def _connect(self, db:str=None, collezione=None):
         '''
         si collega al database e restituisce l'oggetto
         :param db:
+        :param collezione: da non usare
         :return:
         '''
         client =MongoClient(self.url + db+ "?retryWrites=true&w=majority")

@@ -2,15 +2,12 @@
 Convertire liste in set e dizionari nel preprocessing
 1. fare aggregazione dati su MongoDB
 2. fare aggregazione (map-reduce) dati su python per MySQL
-3. creare un DAO interface
-   - creare DAO-MySQL 
-   - creare DAO-MongoDB 
-4. creare MySQL db per buffer e statistiche
-   - creare modello
-5. visualizzare db con statistiche
-6. creare db con statistiche
-   - MySQL
-   - MongoDB
+3. creare db con risultati
+   - schema ER
+   - MySQL tabelle
+   - MongoDB database e collezioni
+4. visualizzare db con statistiche
+   - word cloud
    
 ## Opzionali
 1. Ottimizzare preprocessing di spacy
