@@ -111,6 +111,10 @@ class MongoDBDAO(DAO):
             for mess in messaggi:
                 yield mess
 
+    def test_connessione(self):
+        conn=self._connect("test","test")
+        self._disconnect(conn)
+        return True
 
 if __name__ == '__main__':
     pass

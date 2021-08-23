@@ -2,7 +2,7 @@ from typing import Union, List, Optional, Generator
 
 from pymongo.database import Database
 
-from src.user_exception import interface_exceptions
+from src.user_exception.interface_exceptions import InterfaceException
 
 class DAO:
     """
@@ -12,10 +12,10 @@ class DAO:
         self.url=url
 
     def _connect(self, db:str=None, collezione: str=None):
-        raise interface_exceptions
+        raise InterfaceException
 
     def _disconnect(self, db: Database):
-        raise interface_exceptions
+        raise InterfaceException
 
     def upload_lemmi_of_lexres(self, emozione:Union[str,None], lemmi, drop_if_not_empty: bool):
         '''
@@ -24,7 +24,7 @@ class DAO:
         :param lemmi:
         :return: numero di inserimenti
         '''
-        raise interface_exceptions
+        raise InterfaceException
 
     def upload_twitter_messages(self,emozione:str, messages, drop_if_not_empty: bool):
         '''
@@ -33,7 +33,7 @@ class DAO:
         :param messages:
         :return: numero di inserimenti
         '''
-        raise interface_exceptions
+        raise InterfaceException
 
     def upload_words(self, words: List[Union[str, dict]], emotion: str, type: str = 'word'):
         """
@@ -43,20 +43,23 @@ class DAO:
         :param type:
         :return:
         """
-        raise interface_exceptions
+        raise InterfaceException
 
     def upload_emoji(self,emoji, emotion):
-        raise interface_exceptions
+        raise InterfaceException
 
     def upload_emoticons(self,emoticons, emotion):
-        raise interface_exceptions
+        raise InterfaceException
 
     def upload_hashtags(self,hashtags, emotion):
-        raise interface_exceptions
+        raise InterfaceException
 
     def download_messaggi_twitter(self,emozione:Optional[str])->Generator:
         '''
         generatore di messaggi twitter presi dal db
         '''
-        raise interface_exceptions
+        raise InterfaceException
+
+    def test_connessione(self):
+        raise InterfaceException
 

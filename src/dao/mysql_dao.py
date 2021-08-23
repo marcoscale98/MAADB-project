@@ -122,3 +122,8 @@ class MySQLDAO(DAO):
             cursor.execute(query)
         for messaggio in cursor:
             yield messaggio
+
+    def test_connessione(self):
+        conn=self._connect("test","test")
+        self._disconnect(conn)
+        return True
