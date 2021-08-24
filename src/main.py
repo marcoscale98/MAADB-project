@@ -2,6 +2,7 @@ import os
 
 from src.dao.mongodb_dao import MongoDBDAO
 from src.dao.mysql_dao import MySQLDAO
+from src.dao.dao import DAO
 from src.utils.nomi_db_emozioni import Emotions
 from src.preprocessing_text import preprocessing_text
 
@@ -73,12 +74,24 @@ def test_connessione(dao):
     if res:
         print("Connessione avvenuta con successo")
 
-def insert_tokens(dao):
-    #todo da terminare
+def insert_tokens(dao:DAO):
+    # per ora lo testo solo con pochi messaggi
     messaggi=dao.download_messaggi_twitter(emozione='anger')
-    messaggi=list(map(lambda messaggio: messaggio['message'],messaggi))
-    tweet_preprocessati=preprocessing_text.preprocessing_text((messaggio for messaggio in messaggi))
-    print()
+    tweets=[]
+    i=0
+    for mess in messaggi:
+        tweets.append(mess['message'])
+        if i==3:
+            break
+        i+=1
+    tweet_preprocessati=preprocessing_text.preprocessing_text((t for t in tweets))
+    tweets=list(tweet_preprocessati.values())
+    print(tweets)
+    for t in tweets:
+        dao.upload_emoji([e for e in t['emojis']],'anger')
+        dao.upload_emoticons([e for e in t['emoticons']],'anger')
+        dao.upload_hashtags([h for h in t['hashtags']],'anger')
+        dao.upload_words([word['token'] for word in t['parole']],'anger')
 
 def test_insert_parola(dao):
     res=dao.upload_words(["parola"],"anger")
@@ -105,7 +118,8 @@ if __name__ == '__main__':
     # populate_db_twitter(dao, DROP)
     # test_get_messaggi(dao)
     # test_connessione(dao)
-    test_insert_parola(dao)
-    test_insert_emoticon(dao)
-    test_insert_emoji(dao)
-    test_insert_hashtag(dao)
+    # test_insert_parola(dao)
+    # test_insert_emoticon(dao)
+    # test_insert_emoji(dao)
+    # test_insert_hashtag(dao)
+    insert_tokens(dao)

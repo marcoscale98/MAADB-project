@@ -50,7 +50,7 @@ class MongoDBDAO(DAO):
         self._disconnect(twitter_db)
         return len(num.inserted_ids)
 
-    def _upload_tokens(self, words: list[Union[str, dict]], emotion: str, tipo: str = 'parola', drop_if_not_empty: bool =False):
+    def _upload_tokens(self, tokens: list[Union[str, dict]], emotion: str, tipo: str = 'parola', drop_if_not_empty: bool =False):
         twitter_words_db = self._connect(Nomi_db_mongo.TOKEN_TWITTER.value)
         if drop_if_not_empty:
             self._drop_if_not_empty(Nomi_db_mongo.TOKEN_TWITTER.value, emotion)
@@ -58,9 +58,9 @@ class MongoDBDAO(DAO):
         if tipo not in ("parola", 'hashtag', 'emoji', 'emoticon'):
             raise Exception('tipo not in ("parola","hashtag","emoji","emoticon")')
 
-        if type(words[0]) == str:
-            words = list(map(lambda parola: self._add_type(parola, tipo), words))
-        risultati :InsertManyResult = emot_coll.insert_many(words)
+        if type(tokens[0]) == str:
+            tokens = list(map(lambda parola: self._add_type(parola, tipo), tokens))
+        risultati :InsertManyResult = emot_coll.insert_many(tokens)
         self._disconnect(twitter_words_db)
         return len(risultati.inserted_ids)
 
@@ -75,15 +75,19 @@ class MongoDBDAO(DAO):
         return parola
 
     def upload_words(self, words: list[Union[str,dict]], emotion: str, drop_if_not_empty: bool =False):
+        if len(words)==0: return 0
         return self._upload_tokens(words, emotion, "parola")
 
     def upload_emoji(self,emoji, emotion):
+        if len(emoji)==0: return 0
         return self._upload_tokens(emoji, emotion, "emoji")
 
     def upload_emoticons(self,emoticons, emotion):
+        if len(emoticons)==0: return 0
         return self._upload_tokens(emoticons, emotion, "emoticon")
 
     def upload_hashtags(self,hashtags, emotion):
+        if len(hashtags)==0: return 0
         return self._upload_tokens(hashtags, emotion, 'hashtag')
 
     def _drop_words_collection(self, emotion):

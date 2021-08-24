@@ -15,7 +15,13 @@ Python 3.9
   "hashtags":list(str),
   "emoticons":list(str),
   "emojis":list(str),
-  'parola':str
+  'parole': list(
+    {
+      token: str,
+      lemma: str,
+      pos: str,
+    }
+  )
 }
 ````
 #### Database di buffer

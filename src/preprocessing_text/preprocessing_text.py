@@ -12,6 +12,9 @@ from impostazioni import *
 from res.Risorse_lessicali.Slang_words.slang_words import slang_words
 from res.Risorse_lessicali.emoji_emoticons.emoji_emoticons import posemoticons, negemoticons
 
+nlp = spacy.load('en_core_web_sm', disable=['ner'])
+nlp.disable_pipe("parser")
+nlp.enable_pipe("senter")
 
 def search_emoticons(frase: str) -> Tuple[str, List]:
     trovate = []
@@ -126,9 +129,6 @@ def replace_username_url(frase):
     return frase
 
 if __name__ == '__main__':
-    nlp = spacy.load('en_core_web_sm', disable=['ner'])
-    nlp.disable_pipe("parser")
-    nlp.enable_pipe("senter")
     print(nlp.pipe_names)
 
     client = MongoClient()
