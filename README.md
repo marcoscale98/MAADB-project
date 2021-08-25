@@ -10,18 +10,41 @@ Python 3.9
 ##### Oggetto di output
 ````
 {
-  "id":i,
-  "frase_ripulita": str,
-  "hashtags":list(str),
-  "emoticons":list(str),
-  "emojis":list(str),
-  'parole': list(
-    {
-      token: str,
-      lemma: str,
-      pos: str,
-    }
-  )
+  int: {
+    "id":i,
+    "frase_ripulita": str,
+    "hashtags":list(str),
+    "emoticons":list(str),
+    "emojis":list(str),
+    'parole': list(
+      {
+        token: str,
+        lemma: str,
+        pos: str,
+      }
+    )
+  }
+}
+````
+es.
+````
+{
+  0:{
+    'id': 0, 
+    'frase_ripulita': " f u what's that spell ? fired up ? noo  haha \n",
+     'hashtags': ['#fuckyou'],
+      'emoticons': [], 
+      'emojis': [],
+       'parole': [{'token': "'s", 'lemma': 'be', 'pos': 'VERB'},{'token': 'spell', 'lemma': 'spell', 'pos': 'NOUN'}, {'token': 'fired', 'lemma': 'fire', 'pos': 'VERB'}, {'token': 'noo', 'lemma': 'noo', 'pos': 'VERB'}, {'token': 'haha', 'lemma': 'haha', 'pos': 'NOUN'}]
+  },
+  1: {
+    'id': 1,
+     'frase_ripulita': "now all of you roll tide bandwagon fans will hop off alabama's dick . one wor d: overrated . \n", 
+     'hashtags': [],
+      'emoticons': [], 
+      'emojis': [],
+       'parole': [{'token': 'roll', 'lemma': 'roll', 'pos': 'VERB'}, {'token': 'tide', 'lemma': 'tide', 'pos': 'NOUN'}, {'token': 'bandwagon', 'lemma': 'bandwagon', 'pos': 'NOUN'}, {'token': 'fans', 'lemma': 'fan', 'pos': 'NOUN'}, {'token': 'hop', 'lemma': 'hop', 'pos': 'VERB'}, {'token': 'alabama', 'lemma': 'alabama', 'pos': 'NOUN'}, {'token': "'s", 'lemma': "'s", 'pos': 'PART'}, {'token': 'dick', 'lemma': 'dick', 'pos': 'NOUN'}, {'token': 'one', 'lemma': 'one', 'pos': 'NUM'}, {'token': 'wor', 'lemma': 'wor', 'pos': 'NOUN'}, {'token': 'overrated', 'lemma': 'overrated', 'pos': 'ADJ'}]
+  },
 }
 ````
 #### Database di buffer

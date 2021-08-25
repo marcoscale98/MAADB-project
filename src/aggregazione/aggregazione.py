@@ -3,27 +3,69 @@ qui inserirò le funzioni per fare map-reduce sull'output del preprocessing
 il risultato della map-reduce verrà inviato al MySQL DB
 
 '''
+import itertools
+from itertools import groupby
 from functools import reduce
 from itertools import tee
-from typing import Generator
+from pprint import pprint
+from typing import Generator, Iterator
+from itertools import chain
 
 from src.dao.mysql_dao import MySQLDAO
+from src.preprocessing_text.preprocessing_text import preprocessing_text
 from src.utils import nomi_db_emozioni,config
 
 
-def aggregate(tweets_prep:Generator):
-    gen_hash,gen_emoji,gen_emot,gen_parole=tee(tweets_prep)
-    hashtags=list(map(lambda tweet: tweet['hashtags'],gen_hash))
-    emojis=list(map(lambda tweet: tweet['emojis'],gen_emoji))
-    emoticons=list(map(lambda tweet: tweet['emoticons'],gen_emot))
-    parole=list(map(lambda parola: parola['token'] ,map(lambda tweet: tweet['parole'],gen_parole)))
+def _reduce(lista):
+    lista=sorted(lista)
+    it= groupby(lista)
+    diz=dict()
+    for k,v in it:
+        length=sum(1 for el in v)
+        print(f'chiave: {k}')
+        print(f'valore: {length}')
+        diz[k]=length
+    return diz
+
+
+def aggregate(tweets_prep:Iterator):
+    hashtags,emoticons,emojis,parole= _map(tweets_prep)
+    hashtags = _reduce(hashtags)
+    emoticons = _reduce(emoticons)
+    emojis = _reduce(emojis)
+    parole = _reduce(parole)
     return hashtags,emoticons,emojis,parole
+
+def _map(tweets_prep):
+    gen_hash, gen_emoji, gen_emot, gen_parole = tee(tweets_prep, 4)
+    hashtags = list(map(lambda tweet: tweet['hashtags'], gen_hash))
+    hashtags = chain.from_iterable(hashtags)
+    emojis = list(map(lambda tweet: tweet['emojis'], gen_emoji))
+    emojis = chain.from_iterable(emojis)
+    emoticons = list(map(lambda tweet: tweet['emoticons'], gen_emot))
+    emoticons = chain.from_iterable(emoticons)
+    parole = map(lambda tweet: tweet['parole'], gen_parole)
+    parole_list_flat = chain.from_iterable(list(parole))
+    parole = list(map(lambda tweet: tweet['lemma'], parole_list_flat))
+    return list(hashtags), list(emoticons), list(emojis), parole
+
 
 # test: preprocesso pochi dati e provo ad aggregarli
 
 def test_agggregate():
     dao=MySQLDAO(config.MYSQL_CONFIG)
     gen_mess=dao.download_messaggi_twitter('anger',10)
+    gen_mess=(tweet['message'] for tweet in gen_mess)
+    tweets_prep=preprocessing_text(gen_mess)
+    hashtags,emoticons,emojis,parole=aggregate(tweets_prep.values())
+    print('HASHTAGS')
+    pprint(hashtags, indent=2)
+    print('EMOJIS')
+    pprint(emojis ,indent=2)
+    print('EMOTICONS')
+    pprint(emoticons, indent=2)
+    print('PAROLE')
+    pprint(parole, indent=2)
 
 
 if __name__ == '__main__':
