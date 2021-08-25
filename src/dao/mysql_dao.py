@@ -119,10 +119,15 @@ class MySQLDAO(DAO):
         self._upload_tokens(hashtags, emotion, query)
         return len(hashtags)
 
-    def _upload_tokens(self, tokens, emotion,query, quant=1 ):
+    def _upload_tokens(self, tokens: Union[List,dict], emotion,query):
         conn=self._connect()
         cursor=conn.cursor()
-        tokens_upload= list(map(lambda token: (token,emotion, quant), tokens))
+        if type(tokens)==list:
+            d=dict()
+            for t in tokens:
+                d[t]=1
+            tokens=d
+        tokens_upload= list(map(lambda token,quant: (token,emotion, quant), tokens.items()))
         cursor.executemany(query, tokens_upload)
         return len(tokens)
 

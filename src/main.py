@@ -1,8 +1,10 @@
 import os
 
+from src.aggregazione.aggregazione import aggregate
 from src.dao.mongodb_dao import MongoDBDAO
 from src.dao.mysql_dao import MySQLDAO
 from src.dao.dao import DAO
+from src.utils.config import MYSQL_CONFIG
 from src.utils.nomi_db_emozioni import Emotions
 from src.preprocessing_text import preprocessing_text
 
@@ -78,13 +80,11 @@ def insert_tokens(dao:DAO):
     # per ora lo testo solo con pochi messaggi
     messaggi=dao.download_messaggi_twitter(emozione='anger',limit=10)
     tweet_preprocessati=preprocessing_text.preprocessing_text((t['message'] for t in messaggi))
-    tweets=list(tweet_preprocessati.values())
-    print(tweets)
-    for t in tweets:
-        dao.upload_emoji([e for e in t['emojis']],'anger')
-        dao.upload_emoticons([e for e in t['emoticons']],'anger')
-        dao.upload_hashtags([h for h in t['hashtags']],'anger')
-        dao.upload_words([word['token'] for word in t['parole']],'anger')
+    hashtags,emoticons,emojis,parole=aggregate(tweet_preprocessati)
+    dao.upload_emoji(emojis,'anger')
+    dao.upload_hashtags(hashtags,'anger')
+    dao.upload_emoticons(emoticons,'anger')
+    dao.upload_words(parole,'anger')
 
 def test_insert_parola(dao):
     res=dao.upload_words(["parola"],"anger")
@@ -106,13 +106,13 @@ def test_insert_emoticon(dao):
 if __name__ == '__main__':
     DROP = True
     # dao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
-    dao = MySQLDAO('jdbc:mysql://localhost:3306?serverTimezone=UTC')
+    dao = MySQLDAO(MYSQL_CONFIG)
     # populate_db_lexres(dao,DROP)
     # populate_db_twitter(dao, DROP)
     # test_get_messaggi(dao)
-    test_connessione(dao)
+    # test_connessione(dao)
     # test_insert_parola(dao)
     # test_insert_emoticon(dao)
     # test_insert_emoji(dao)
     # test_insert_hashtag(dao)
-    # insert_tokens(dao)
+    insert_tokens(dao)

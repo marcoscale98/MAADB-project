@@ -29,7 +29,11 @@ def _reduce(lista):
 
 
 def aggregate(tweets_prep:Iterator):
-    hashtags,emoticons,emojis,parole= _map(tweets_prep)
+    '''
+    restituisce una quadrupla di dizionari del tipo <parola,quantità>
+    la quadrupla: hashtags,emoticons,emojis,parole
+    '''
+    hashtags,emoticons,emojis,parole= _map(tweets_prep.values())
     hashtags = _reduce(hashtags)
     emoticons = _reduce(emoticons)
     emojis = _reduce(emojis)
