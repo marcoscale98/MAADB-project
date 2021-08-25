@@ -16,6 +16,15 @@ from src.utils.nomi_db_emozioni import Nomi_db_mysql
 
 class MySQLDAO(DAO):
     def __init__(self, url=None):
+        '''
+        url è un dizionario di configurazione
+        es. {
+                'user':str,
+                'password':str,
+                'host':str,
+                'database': str,
+            }
+        '''
         self.url=url
 
     def _connect(self, db: str = None, collezione: str = None):
@@ -26,7 +35,7 @@ class MySQLDAO(DAO):
         :return:
         '''
         try:
-            cnx = mysql.connector.connect(self.url)
+            cnx = mysql.connector.connect(**self.url)
             cnx.autocommit = True
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -133,14 +142,10 @@ class MySQLDAO(DAO):
         cursor=conn.cursor()
         query=f'SELECT * FROM {Nomi_db_mysql.MESSAGGIO_TWITTER.value}'
         if emozione is not None:
-            query += " WHERE emozione=%s"
-            data=(emozione,)
+            query += f" WHERE emozione='{emozione}'"
         if limit is not None:
             query += f" LIMIT {limit}"
-        if emozione is not None:
-            cursor.executemany(query,data)
-        else:
-            cursor.executemany(query)
+        cursor.execute(query)
         for messaggio in cursor:
             mess={
                 'id':messaggio[0],
@@ -156,9 +161,13 @@ class MySQLDAO(DAO):
 
     def _test_download_messaggi(self):
         messaggi=self.download_messaggi_twitter('anger',10)
-        pprint(messaggi)
+        pprint(list(messaggi))
+    def _test_download_tutti_messaggi(self):
+        messaggi=self.download_messaggi_twitter('anger')
+        pprint(f"Messaggi scaricati {len(list(messaggi))}")
 
 if __name__ == '__main__':
-    dao=MySQLDAO(**MYSQL_CONFIG)
+    dao=MySQLDAO(MYSQL_CONFIG)
     dao.test_connessione()
     dao._test_download_messaggi()
+    dao._test_download_tutti_messaggi()

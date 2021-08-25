@@ -7,6 +7,9 @@ from functools import reduce
 from itertools import tee
 from typing import Generator
 
+from src.dao.mysql_dao import MySQLDAO
+from src.utils import nomi_db_emozioni,config
+
 
 def aggregate(tweets_prep:Generator):
     gen_hash,gen_emoji,gen_emot,gen_parole=tee(tweets_prep)
@@ -19,7 +22,9 @@ def aggregate(tweets_prep:Generator):
 # test: preprocesso pochi dati e provo ad aggregarli
 
 def test_agggregate():
-    pass
+    dao=MySQLDAO(config.MYSQL_CONFIG)
+    gen_mess=dao.download_messaggi_twitter('anger',10)
+
 
 if __name__ == '__main__':
     test_agggregate()
