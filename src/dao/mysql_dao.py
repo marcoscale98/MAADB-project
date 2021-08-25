@@ -1,4 +1,5 @@
 import sys
+from pprint import pprint
 from typing import Union, List, Optional, Generator
 
 import math
@@ -15,7 +16,7 @@ from src.utils.nomi_db_emozioni import Nomi_db_mysql
 
 class MySQLDAO(DAO):
     def __init__(self, url=None):
-        super().__init__(url)
+        self.url=url
 
     def _connect(self, db: str = None, collezione: str = None):
         '''
@@ -25,7 +26,7 @@ class MySQLDAO(DAO):
         :return:
         '''
         try:
-            cnx = mysql.connector.connect(**MYSQL_CONFIG)
+            cnx = mysql.connector.connect(self.url)
             cnx.autocommit = True
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -127,16 +128,19 @@ class MySQLDAO(DAO):
         except IntegrityError:
             pass
 
-    def download_messaggi_twitter(self, emozione: Optional[str]) -> Generator:
+    def download_messaggi_twitter(self, emozione: Optional[str], limit:int=None) -> Generator:
         conn=self._connect()
         cursor=conn.cursor()
         query=f'SELECT * FROM {Nomi_db_mysql.MESSAGGIO_TWITTER.value}'
         if emozione is not None:
             query += " WHERE emozione=%s"
             data=(emozione,)
-            cursor.execute(query,data)
+        if limit is not None:
+            query += f" LIMIT {limit}"
+        if emozione is not None:
+            cursor.executemany(query,data)
         else:
-            cursor.execute(query)
+            cursor.executemany(query)
         for messaggio in cursor:
             mess={
                 'id':messaggio[0],
@@ -147,4 +151,14 @@ class MySQLDAO(DAO):
     def test_connessione(self):
         conn=self._connect("test","test")
         self._disconnect(conn)
+        print("Connessione effettuata con successo")
         return True
+
+    def _test_download_messaggi(self):
+        messaggi=self.download_messaggi_twitter('anger',10)
+        pprint(messaggi)
+
+if __name__ == '__main__':
+    dao=MySQLDAO(**MYSQL_CONFIG)
+    dao.test_connessione()
+    dao._test_download_messaggi()
