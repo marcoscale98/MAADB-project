@@ -76,15 +76,8 @@ def test_connessione(dao):
 
 def insert_tokens(dao:DAO):
     # per ora lo testo solo con pochi messaggi
-    messaggi=dao.download_messaggi_twitter(emozione='anger')
-    tweets=[]
-    i=0
-    for mess in messaggi:
-        tweets.append(mess['message'])
-        if i==3:
-            break
-        i+=1
-    tweet_preprocessati=preprocessing_text.preprocessing_text((t for t in tweets))
+    messaggi=dao.download_messaggi_twitter(emozione='anger',limit=10)
+    tweet_preprocessati=preprocessing_text.preprocessing_text((t['message'] for t in messaggi))
     tweets=list(tweet_preprocessati.values())
     print(tweets)
     for t in tweets:

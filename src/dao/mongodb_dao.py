@@ -1,3 +1,4 @@
+from pprint import pprint
 from typing import Union, Optional, Generator
 
 from pymongo import MongoClient
@@ -104,10 +105,16 @@ class MongoDBDAO(DAO):
             emot_coll.drop()
         self._disconnect(database)
 
-    def download_messaggi_twitter(self, emozione: Optional[str]='anger') -> Generator:
+    def download_messaggi_twitter(self, emozione: Optional[str]='anger',limit:int=None) -> Generator:
         min = 0
         max = 100
-        while True:
+        if limit is not None:
+            cond= (lambda : min>limit)
+        else:
+            cond=(lambda : True)
+        while cond():
+            if max>limit:
+                max=limit
             db = self._connect(Nomi_db_mongo.MESSAGGIO_TWITTER.value)
             emozione_coll=db[emozione]
             cursor=emozione_coll.find()[min:max]
@@ -125,9 +132,16 @@ class MongoDBDAO(DAO):
         conn=self._connect("test","test")
         self._disconnect(conn)
         return True
-
+    def _test_download_messaggi(self):
+        messaggi=self.download_messaggi_twitter('anger',10)
+        pprint(list(messaggi))
+    def _test_download_tutti_messaggi(self):
+        messaggi=self.download_messaggi_twitter('anger')
+        pprint(f"Messaggi scaricati {len(list(messaggi))}")
 if __name__ == '__main__':
-    pass
-    # mongodb_dao = MongoDBDAO("mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/")
+    # pass
+    mongodb_dao = MongoDBDAO("mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/")
     # mongodb_dao.populate_db_twitter()
     # mongodb_dao.populate_db_lexres()
+    mongodb_dao._test_download_messaggi()
+    mongodb_dao._test_download_tutti_messaggi()

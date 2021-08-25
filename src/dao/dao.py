@@ -54,7 +54,7 @@ class DAO:
     def upload_hashtags(self,hashtags, emotion)->int:
         raise InterfaceException
 
-    def download_messaggi_twitter(self,emozione:Optional[str])->Generator:
+    def download_messaggi_twitter(self,emozione:Optional[str],limit:int=None)->Generator:
         '''
         generatore di messaggi twitter presi dal db
         '''
