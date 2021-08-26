@@ -15,6 +15,7 @@ class MongoDBDAO(DAO):
 
     def __init__(self, url):
         super().__init__(url)
+        self.url=url
 
     def _connect(self, db:str=None, collezione=None):
         '''
@@ -23,7 +24,7 @@ class MongoDBDAO(DAO):
         :param collezione: da non usare
         :return:
         '''
-        client =MongoClient(self.url + db+ "?retryWrites=true&w=majority")
+        client =MongoClient(**self.url)
         return client[db]
 
     def _disconnect(self,db:Database):
@@ -58,9 +59,7 @@ class MongoDBDAO(DAO):
         emot_coll: Collection = twitter_words_db[emotion]
         if tipo not in ("parola", 'hashtag', 'emoji', 'emoticon'):
             raise Exception('tipo not in ("parola","hashtag","emoji","emoticon")')
-
-        if type(tokens[0]) == str:
-            tokens = list(map(lambda parola: self._add_type(parola, tipo), tokens))
+        tokens = list(map(lambda token: self._add_type(token, tipo), tokens))
         risultati :InsertManyResult = emot_coll.insert_many(tokens)
         self._disconnect(twitter_words_db)
         return len(risultati.inserted_ids)
@@ -79,15 +78,15 @@ class MongoDBDAO(DAO):
         if len(words)==0: return 0
         return self._upload_tokens(words, emotion, "parola")
 
-    def upload_emoji(self,emoji, emotion):
+    def upload_emoji(self,emoji, emotion,drop_if_not_empty: bool =False):
         if len(emoji)==0: return 0
         return self._upload_tokens(emoji, emotion, "emoji")
 
-    def upload_emoticons(self,emoticons, emotion):
+    def upload_emoticons(self,emoticons, emotion,drop_if_not_empty: bool =False):
         if len(emoticons)==0: return 0
         return self._upload_tokens(emoticons, emotion, "emoticon")
 
-    def upload_hashtags(self,hashtags, emotion):
+    def upload_hashtags(self,hashtags, emotion,drop_if_not_empty: bool =False):
         if len(hashtags)==0: return 0
         return self._upload_tokens(hashtags, emotion, 'hashtag')
 
@@ -109,11 +108,11 @@ class MongoDBDAO(DAO):
         min = 0
         max = 100
         if limit is not None:
-            cond= (lambda : min>limit)
+            cond= (lambda : min<limit)
         else:
             cond=(lambda : True)
         while cond():
-            if max>limit:
+            if limit and max>limit:
                 max=limit
             db = self._connect(Nomi_db_mongo.MESSAGGIO_TWITTER.value)
             emozione_coll=db[emozione]

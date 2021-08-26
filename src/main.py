@@ -1,12 +1,15 @@
 import json
 import os
+from itertools import chain, tee
 
+from src.aggregazione import aggregazione
 from src.aggregazione.aggregazione import aggregate
 from src.dao.mongodb_dao import MongoDBDAO
 from src.dao.mysql_dao import MySQLDAO
 from src.dao.dao import DAO
+from src.utils import config
 from src.utils.config import MYSQL_CONFIG
-from src.utils.nomi_db_emozioni import Emotions
+from src.utils.nomi_db_emozioni import Emotions, Nomi_db_mongo
 from src.preprocessing_text import preprocessing_text
 from tqdm import tqdm
 
@@ -78,33 +81,48 @@ def test_connessione(dao):
     if res:
         print("Connessione avvenuta con successo")
 
-
+def _map(tweets_prep):
+    tweets_prep=tweets_prep.values()
+    gen_hash, gen_emoji, gen_emot, gen_parole = tee(tweets_prep, 4)
+    hashtags = list(map(lambda tweet: tweet['hashtags'], gen_hash))
+    hashtags = chain.from_iterable(hashtags)
+    emojis = list(map(lambda tweet: tweet['emojis'], gen_emoji))
+    emojis = chain.from_iterable(emojis)
+    emoticons = list(map(lambda tweet: tweet['emoticons'], gen_emot))
+    emoticons = chain.from_iterable(emoticons)
+    parole = map(lambda tweet: tweet['parole'], gen_parole)
+    parole_list_flat = chain.from_iterable(list(parole))
+    return list(hashtags), list(emoticons), list(emojis), list(parole_list_flat)
 
 def insert_tokens(dao:DAO,emozione, limit=None,use_backup=False):
     if use_backup:
-        hashtags=load_preprocessed('hashtags')
-        emojis=load_preprocessed('emojis')
-        emoticons=load_preprocessed('emoticons')
-        parole=load_preprocessed('parole')
+        tweets_preprocessati=load_preprocessed('tweet_preprocessed')
     else:
         print('scarico tweets')
         messaggi=dao.download_messaggi_twitter(emozione=emozione,limit=limit)
         print('preprocesso tweets')
         tweet_preprocessati=preprocessing_text.preprocessing_text((t['message'] for t in messaggi))
-        print('aggrego tweets')
-        hashtags,emoticons,emojis,parole=aggregate(tweet_preprocessati)
-        save_preprocessing(hashtags,'hashtags')
-        save_preprocessing(emojis,'emojis')
-        save_preprocessing(emoticons,'emoticons')
-        save_preprocessing(parole,'parole')
-    n=dao.upload_emoji(emojis,emozione)
-    print(f'{n} emojis inserite')
-    n=dao.upload_hashtags(hashtags,emozione)
-    print(f'{n} hashtags inseriti')
-    n=dao.upload_emoticons(emoticons,emozione)
-    print(f'{n} emoticons inserite')
-    n=dao.upload_words(parole,emozione)
-    print(f'{n} parole inserite')
+        save_preprocessing(tweet_preprocessati,'tweet_preprocessed')
+        if type(dao)==MySQLDAO:
+            print('aggrego tweets')
+            hashtags,emoticons,emojis,parole=aggregate(tweet_preprocessati)
+        elif type(dao)==MongoDBDAO:
+            dao._drop_if_not_empty(Nomi_db_mongo.TOKEN_TWITTER.value, 'anger')
+            print('Inizio map')
+            hashtags,emoticons,emojis,parole=_map(tweet_preprocessati)
+
+        n = dao.upload_emoji(emojis, emozione)
+        print(f'{n} emojis inserite')
+
+        n = dao.upload_hashtags(hashtags, emozione)
+        print(f'{n} hashtags inseriti')
+
+        n = dao.upload_emoticons(emoticons, emozione)
+        print(f'{n} emoticons inserite')
+
+        n = dao.upload_words(parole, emozione)
+        print(f'{n} parole inserite')
+
 
 def test_insert_parola(dao):
     res=dao.upload_words(["parola"],"anger")
@@ -130,6 +148,7 @@ def save_preprocessing(lista,tipo):
         mode='x'
     with open(file,mode) as fp:
         json.dump(lista,fp)
+
 def load_preprocessed(tipo):
     cartella = 'src/preprocessing_text/json/'
     file = cartella + tipo + '.json'
@@ -141,14 +160,15 @@ def load_preprocessed(tipo):
 if __name__ == '__main__':
     DROP = True
     USE_BACKUP=False
-    # dao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
-    dao = MySQLDAO(MYSQL_CONFIG)
+    dao = MongoDBDAO(config.MONGO_CONFIG)
+    # dao = MySQLDAO(MYSQL_CONFIG)
+    # test_connessione(dao)
     # populate_db_lexres(dao,DROP)
     # populate_db_twitter(dao, DROP)
     # dao._test_download_messaggi()
-    # test_connessione(dao)
     # test_insert_parola(dao)
     # test_insert_emoticon(dao)
     # test_insert_emoji(dao)
     # test_insert_hashtag(dao)
+
     insert_tokens(dao,'anger',use_backup=USE_BACKUP)
