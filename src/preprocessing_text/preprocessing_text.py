@@ -63,7 +63,11 @@ def secondo_processing(list_token):
     # remove stop words
     without_stop_words = [t for t in nuovi_tokens if t['token'] not in stopwords.words('english')]
     # remuove punteggiatura, parole mal formate e eventuali caratteri speciali
-    parole_senza_punteggiatura = [t for t in without_stop_words if t['pos'] not in {'SPACE', 'SYM', 'PUNCT', 'X'}]
+    parole_senza_punteggiatura=[]
+    for t in without_stop_words:
+        if t['pos'] not in ('SPACE', 'SYM', 'PUNCT', 'X'):
+            if t['token'] not in "?!^,.-;:_+*[]{}=()/|\\\"'<>`´´‹~¥‘“«":
+                parole_senza_punteggiatura.append(t)
     # tutto lower
     for t in parole_senza_punteggiatura:
         t['lemma'] = t['lemma'].lower()

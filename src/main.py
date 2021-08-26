@@ -140,7 +140,7 @@ def load_preprocessed(tipo):
 
 if __name__ == '__main__':
     DROP = True
-    USE_BACKUP=True
+    USE_BACKUP=False
     # dao = MongoDBDAO('mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/')
     dao = MySQLDAO(MYSQL_CONFIG)
     # populate_db_lexres(dao,DROP)
