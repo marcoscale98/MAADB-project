@@ -21,7 +21,7 @@ SET time_zone = "+00:00";
 --
 -- Database: `maadb_project`
 --
-CREATE DATABASE IF NOT EXISTS `maadb_project` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS `maadb_project` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
 USE `maadb_project`;
 
 -- --------------------------------------------------------
@@ -32,10 +32,10 @@ USE `maadb_project`;
 
 DROP TABLE IF EXISTS `emoji_contenuta`;
 CREATE TABLE `emoji_contenuta` (
-  `emoji` varchar(1) NOT NULL,
+  `emoji` varchar(4) NOT NULL,
   `emozione` enum('anger','anticipation','disgust','fear','joy','sadness','surprise','trust') NOT NULL,
   `quantita` int(11) NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
 -- --------------------------------------------------------
 
@@ -48,7 +48,7 @@ CREATE TABLE `emoticon_contenuta` (
   `emoticon` varchar(6) NOT NULL,
   `emozione` enum('anger','anticipation','disgust','fear','joy','sadness','surprise','trust') NOT NULL,
   `quantita` int(11) NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
 -- --------------------------------------------------------
 
@@ -58,10 +58,10 @@ CREATE TABLE `emoticon_contenuta` (
 
 DROP TABLE IF EXISTS `hashtag_contenuto`;
 CREATE TABLE `hashtag_contenuto` (
-  `hashtag` varchar(20) NOT NULL,
+  `hashtag` varchar(256) NOT NULL,
   `emozione` enum('anger','anticipation','disgust','fear','joy','sadness','surprise','trust') NOT NULL,
   `quantita` int(11) NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
 -- --------------------------------------------------------
 
@@ -74,7 +74,7 @@ CREATE TABLE `messaggio_twitter` (
   `id` int(32) NOT NULL,
   `messaggio` text NOT NULL,
   `emozione` enum('anger','anticipation','disgust','fear','joy','sadness','surprise','trust') NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
 -- --------------------------------------------------------
 
@@ -84,8 +84,8 @@ CREATE TABLE `messaggio_twitter` (
 
 DROP TABLE IF EXISTS `parola`;
 CREATE TABLE `parola` (
-  `parola` varchar(32) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `parola` varchar(256) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
 -- --------------------------------------------------------
 
@@ -95,10 +95,10 @@ CREATE TABLE `parola` (
 
 DROP TABLE IF EXISTS `parola_contenuta`;
 CREATE TABLE `parola_contenuta` (
-  `parola` varchar(32) NOT NULL,
+  `parola` varchar(256) NOT NULL,
   `emozione` enum('anger','anticipation','disgust','fear','joy','sadness','surprise','trust') NOT NULL,
   `quantita` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
 -- --------------------------------------------------------
 
@@ -112,7 +112,7 @@ CREATE TABLE `risorsa_lessicale` (
   `emozione` enum('anger','anticipation','disgust','fear','joy','sadness','surprise','trust') NOT NULL,
   `id` int(32) NOT NULL,
   `parola` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
 --
 -- Indici per le tabelle scaricate

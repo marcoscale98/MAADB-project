@@ -91,7 +91,7 @@ class MySQLDAO(DAO):
 
     def upload_words(self, words: List[Union[str, dict]], emotion: str):
         if len(words)==0: return 0
-        query = f'INSERT INTO {Nomi_db_mysql.PAROLA_CONTENUTA.value} (parola,emozione,quantita) values (%s,%s,%s)'
+        query = f'INSERT IGNORE INTO {Nomi_db_mysql.PAROLA_CONTENUTA.value} (parola,emozione,quantita) values (%s,%s,%s)'
         self._upload_tokens(words, emotion, query)
 
         query=f'INSERT IGNORE INTO {Nomi_db_mysql.PAROLA.value} (parola) values (%s)'
@@ -127,7 +127,7 @@ class MySQLDAO(DAO):
             for t in tokens:
                 d[t]=1
             tokens=d
-        tokens_upload= list(map(lambda token,quant: (token,emotion, quant), tokens.items()))
+        tokens_upload= list(map(lambda item: (item[0],emotion, item[1]), tokens.items()))
         cursor.executemany(query, tokens_upload)
         return len(tokens)
 
