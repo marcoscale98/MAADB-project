@@ -66,7 +66,7 @@ def secondo_processing(list_token):
     parole_senza_punteggiatura=[]
     for t in without_stop_words:
         if t['pos'] not in ('SPACE', 'SYM', 'PUNCT', 'X'):
-            if t['token'] not in "?!^,.-;:_+*[]{}=()/|\\\"'<>`´´‹~¥‘“«":
+            if t['token'] not in "&?!^,.-;:_+*[]{}=()/|\\\"'<>`´´‹~¥‘“«":
                 parole_senza_punteggiatura.append(t)
     # tutto lower
     for t in parole_senza_punteggiatura:
