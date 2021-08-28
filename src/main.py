@@ -2,16 +2,15 @@ import json
 import os
 from itertools import chain, tee
 
-from src.aggregazione import aggregazione
-from src.aggregazione.aggregazione import aggregate
+from src.aggregazione.mongodb.aggregazione import aggregazione
+from src.aggregazione.mysql.aggregazione import aggregate
 from src.dao.mongodb_dao import MongoDBDAO
 from src.dao.mysql_dao import MySQLDAO
 from src.dao.dao import DAO
 from src.utils import config
-from src.utils.config import MYSQL_CONFIG
 from src.utils.nomi_db_emozioni import Emotions, Nomi_db_mongo
 from src.preprocessing_text import preprocessing_text
-from tqdm import tqdm
+
 
 def populate_db_lexres(dao,drop_if_not_empty):
     # inseriamo nel database `buffer_lexical_resources` una collezione per ogni emozione
@@ -140,6 +139,9 @@ def test_insert_emoticon(dao):
     res=dao.upload_emoticons([':)'],'anger')
     print(f'Inseriti {res} emoticon')
 
+def test_aggregate_mongo(mongo_dao:MongoDBDAO,drop_if_not_empty=False):
+    aggregazione(mongo_dao,'anger',drop_if_not_empty)
+
 def save_preprocessing(lista,tipo):
     cartella='src/preprocessing_text/json/'
     file=cartella+tipo+'.json'
@@ -171,4 +173,5 @@ if __name__ == '__main__':
     # test_insert_emoji(dao)
     # test_insert_hashtag(dao)
 
-    insert_tokens(dao,'anger',use_backup=USE_BACKUP)
+    # insert_tokens(dao,'anger',use_backup=USE_BACKUP)
+    test_aggregate_mongo(dao,DROP)

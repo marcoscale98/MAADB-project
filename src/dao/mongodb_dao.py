@@ -17,22 +17,31 @@ class MongoDBDAO(DAO):
         super().__init__(url)
         self.url=url
 
-    def _connect(self, db:str=None, collezione=None):
+    def _connect(self, db:str=None, collezione:str=None)->Union[Database,Collection]:
         '''
         si collega al database e restituisce l'oggetto
         :param db:
-        :param collezione: da non usare
+        :param collezione:
         :return:
         '''
         client =MongoClient(**self.url)
-        return client[db]
+        if collezione:
+            return client[db][collezione]
+        else:
+            return client[db]
 
-    def _disconnect(self,db:Database):
+    def _disconnect(self,conn:Union[Database,Collection]):
         '''
         si disconnette dal client mongo
         :param db:
         :return:
         '''
+        if type(conn)==Collection:
+            db=conn.database
+        elif type(conn)==Database:
+            db=conn
+        else:
+            raise Exception('per disconnetermi dal MongoDB devi passare come parametro o il puntatore al db o ad una collezione')
         db.client.close()
 
     def upload_lemmi_of_lexres(self, emozione:str, lemmi, drop_if_not_empty:bool):
@@ -97,12 +106,11 @@ class MongoDBDAO(DAO):
         self._disconnect(words_db)
 
     def _drop_if_not_empty(self, db: str, emozione: str):
-        database = self._connect(db)
-        emot_coll = database[emozione]
+        emot_coll = self._connect(db,emozione)
         count=emot_coll.count_documents({})
         if count > 0:
             emot_coll.drop()
-        self._disconnect(database)
+        self._disconnect(emot_coll)
 
     def download_messaggi_twitter(self, emozione: Optional[str]='anger',limit:int=None) -> Generator:
         min = 0
@@ -137,6 +145,49 @@ class MongoDBDAO(DAO):
     def _test_download_tutti_messaggi(self):
         messaggi=self.download_messaggi_twitter('anger')
         pprint(f"Messaggi scaricati {len(list(messaggi))}")
+
+    def aggregate(self,emozione):
+        for tipo in ('parola','emoji','emoticon','hashtag'):
+            if tipo=='parola':
+                campo_da_raggruppare='$lemma'
+            else:
+                campo_da_raggruppare='$token'
+            stages = [
+                {
+                    '$match': {
+                        'tipo': tipo,
+                    }
+                }, {
+                    '$group': {
+                        '_id': campo_da_raggruppare,
+                        'quantita': {
+                            '$sum': 1
+                        },
+                        'tipo': {
+                            '$first': '$tipo'
+                        }
+                    }
+                }, {
+                    '$set': {
+                        'token': '$_id'
+                    }
+                }, {
+                    '$merge': {
+                        'into': {
+                            'db': 'tokens_aggregati',
+                            'coll': emozione
+                        },
+                        'on': '_id',
+                        'whenMatched': 'replace',
+                        'whenNotMatched': 'insert'
+                    }
+                }
+            ]
+            conn=self._connect("token_twitter",emozione)
+            res=conn.aggregate(stages)
+            print(list(res))
+            self._disconnect(conn)
+
 if __name__ == '__main__':
     # pass
     mongodb_dao = MongoDBDAO("mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/")
