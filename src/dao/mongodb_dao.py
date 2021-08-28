@@ -7,6 +7,7 @@ from pymongo.database import Database
 from pymongo.results import InsertManyResult
 
 from src.dao.dao import DAO
+from src.utils.config import MONGO_CONFIG
 
 from src.utils.nomi_db_emozioni import Nomi_db_mongo
 
@@ -146,6 +147,85 @@ class MongoDBDAO(DAO):
         messaggi=self.download_messaggi_twitter('anger')
         pprint(f"Messaggi scaricati {len(list(messaggi))}")
 
+    def download_emojis(self,emozione,limit=0) -> dict:
+        '''
+
+        :param emozione:
+        :param limit:
+        :return:
+        '''
+        coll=self._connect(Nomi_db_mongo.TOKENS_AGGREGATI.value,emozione)
+        cursor=coll.find(
+            {'tipo':'emoji'}, #filter
+            {'_id':0}, #project
+            limit=limit,
+        )
+        res={}
+        cursor.batch_size(100)
+        for obj in cursor:
+            res[obj['token']]=obj['quantita']
+        self._disconnect(coll)
+        return res
+
+    def download_emoticons(self,emozione,limit=0) -> dict:
+        '''
+
+        :param emozione:
+        :param limit:
+        :return:
+        '''
+        coll = self._connect(Nomi_db_mongo.TOKENS_AGGREGATI.value, emozione)
+        cursor = coll.find(
+            {'tipo': 'emoticon'},  # filter
+            {'_id': 0},  # project
+            limit=limit,
+        )
+        res = {}
+        cursor.batch_size(100)
+        for obj in cursor:
+            res[obj['token']] = obj['quantita']
+        self._disconnect(coll)
+        return res
+
+    def download_parole(self,emozione,limit=0) -> dict:
+        '''
+
+        :param emozione:
+        :param limit:
+        :return:
+        '''
+        coll = self._connect(Nomi_db_mongo.TOKENS_AGGREGATI.value, emozione)
+        cursor = coll.find(
+            {'tipo': 'parola'},  # filter
+            {'_id': 0},  # project
+            limit=limit,
+        )
+        res = {}
+        cursor.batch_size(100)
+        for obj in cursor:
+            res[obj['token']] = obj['quantita']
+        self._disconnect(coll)
+        return res
+    def download_hashtags(self,emozione,limit=0) -> dict:
+        '''
+
+        :param emozione:
+        :param limit:
+        :return:
+        '''
+        coll = self._connect(Nomi_db_mongo.TOKENS_AGGREGATI.value, emozione)
+        cursor = coll.find(
+            {'tipo': 'hashtag'},  # filter
+            {'_id': 0},  # project
+            limit=limit,
+        )
+        res = {}
+        cursor.batch_size(100)
+        for obj in cursor:
+            res[obj['token']] = obj['quantita']
+        self._disconnect(coll)
+        return res
+
     def aggregate(self,emozione):
         for tipo in ('parola','emoji','emoticon','hashtag'):
             if tipo=='parola':
@@ -190,8 +270,16 @@ class MongoDBDAO(DAO):
 
 if __name__ == '__main__':
     # pass
-    mongodb_dao = MongoDBDAO("mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/")
+    mongodb_dao = MongoDBDAO(MONGO_CONFIG)
     # mongodb_dao.populate_db_twitter()
     # mongodb_dao.populate_db_lexres()
-    mongodb_dao._test_download_messaggi()
-    mongodb_dao._test_download_tutti_messaggi()
+    # mongodb_dao._test_download_messaggi()
+    # mongodb_dao._test_download_tutti_messaggi()
+    emojis=mongodb_dao.download_emojis('anger',limit=10)
+    emoticons=mongodb_dao.download_emoticons('anger',limit=10)
+    parole=mongodb_dao.download_parole('anger',limit=10)
+    hashtags=mongodb_dao.download_hashtags('anger',limit=10)
+    pprint(emojis,indent=2)
+    pprint(emoticons,indent=2)
+    pprint(parole,indent=2)
+    pprint(hashtags,indent=2)

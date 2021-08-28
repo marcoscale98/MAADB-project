@@ -5,6 +5,7 @@ class Nomi_db_mongo(Enum):
     TOKEN_TWITTER= "token_twitter"
     RISORSA_LESSICALE= "risorsa_lessicale"
     MESSAGGIO_TWITTER= "messaggio_twitter"
+    TOKENS_AGGREGATI="tokens_aggregati"
 
 class Nomi_db_mysql(Enum):
     EMOJI_CONTENUTA='emoji_contenuta'

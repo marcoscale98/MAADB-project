@@ -63,3 +63,31 @@ class DAO:
     def test_connessione(self):
         raise InterfaceException
 
+    def download_emojis(self,emozione)->dict:
+        '''
+
+        :return: dict=<token,quantita>
+        '''
+        raise InterfaceException
+
+    def download_emoticons(self,emozione)-> dict:
+        '''
+
+        :return: dict=<token,quantita>
+        '''
+        raise InterfaceException
+
+    def download_parole(self,emozione)-> dict:
+        '''
+
+        :return: dict=<token,quantita>
+        '''
+        raise InterfaceException
+
+    def download_hashtags(self,emozione)-> dict:
+        '''
+
+        :return: dict=<token,quantita>
+        '''
+        raise InterfaceException
+
