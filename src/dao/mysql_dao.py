@@ -171,8 +171,73 @@ class MySQLDAO(DAO):
         messaggi=self.download_messaggi_twitter('anger')
         pprint(f"Messaggi scaricati {len(list(messaggi))}")
 
+    def download_emojis(self, emozione,limit:int=None) -> dict:
+        conn=self._connect()
+        cursor=conn.cursor()
+        query=f'SELECT * FROM {Nomi_db_mysql.EMOJI_CONTENUTA.value}'
+        if emozione is not None:
+            query += f" WHERE emozione='{emozione}'"
+        if limit:
+            query += f" LIMIT {limit}"
+        cursor.execute(query)
+        res={}
+        for obj in cursor:
+            res[obj[0]]=obj[2]
+        return res
+
+    def download_emoticons(self, emozione,limit:int=None) -> dict:
+        conn=self._connect()
+        cursor=conn.cursor()
+        query=f'SELECT * FROM {Nomi_db_mysql.EMOTICON_CONTENUTA.value}'
+        if emozione is not None:
+            query += f" WHERE emozione='{emozione}'"
+        if limit:
+            query += f" LIMIT {limit}"
+        cursor.execute(query)
+        res={}
+        for obj in cursor:
+            res[obj[0]]=obj[2]
+        return res
+
+    def download_parole(self, emozione,limit:int=None) -> dict:
+        conn=self._connect()
+        cursor=conn.cursor()
+        query=f'SELECT * FROM {Nomi_db_mysql.PAROLA_CONTENUTA.value}'
+        if emozione is not None:
+            query += f" WHERE emozione='{emozione}'"
+        if limit:
+            query += f" LIMIT {limit}"
+        cursor.execute(query)
+        res={}
+        for obj in cursor:
+            res[obj[0]]=obj[2]
+        return res
+
+    def download_hashtags(self, emozione,limit:int=None) -> dict:
+        conn=self._connect()
+        cursor=conn.cursor()
+        query=f'SELECT * FROM {Nomi_db_mysql.HASHTAG_CONTENUTO.value}'
+        if emozione is not None:
+            query += f" WHERE emozione='{emozione}'"
+        if limit:
+            query += f" LIMIT {limit}"
+        cursor.execute(query)
+        res={}
+        for obj in cursor:
+            res[obj[0]]=obj[2]
+        return res
+
+
 if __name__ == '__main__':
     dao=MySQLDAO(MYSQL_CONFIG)
     dao.test_connessione()
-    dao._test_download_messaggi()
-    dao._test_download_tutti_messaggi()
+    # dao._test_download_messaggi()
+    # dao._test_download_tutti_messaggi()
+    emojis = dao.download_emojis('anger', limit=10)
+    emoticons = dao.download_emoticons('anger', limit=10)
+    parole = dao.download_parole('anger', limit=10)
+    hashtags = dao.download_hashtags('anger', limit=10)
+    pprint(emojis, indent=2)
+    pprint(emoticons, indent=2)
+    pprint(parole, indent=2)
+    pprint(hashtags, indent=2)
