@@ -127,7 +127,10 @@ a cui verrà aggiunto il campo `quant` (quantità del lemma trovato)
 
 1. Quando si ottengono le statistiche (è un'aggregazione, una reduce)
 2. Per aggregare gli stessi lemmi trovati nei messaggi e contarli
-
+## Cosa ho usato del materiale messo a disposizione dalla prof
+[X] emoticons
+[ ] emoji (ho usato una lib)
+[X] risorse lessicali EmoSN, sentisense, NRC
 ## Osservazioni su Risorse messaggi Twitter
 ### Tag
 USERNAME : indica un username di un utente Twitter.  

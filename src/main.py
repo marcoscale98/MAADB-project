@@ -124,21 +124,33 @@ def insert_tokens(dao:DAO,emozione, limit=None,use_backup=False):
         n = dao.upload_words(parole, emozione)
         print(f'{n} parole inserite')
 
-def print_wordclouds(dao:DAO):
+def print_wordclouds(dao:DAO,tipo:str,emozione:str):
     '''
     disegna la word cloud dei token più utilizzati nei tweets dell' *emozione* data
     :param tipo: 'emoji','emoticon','parola','hashtag'
     :param emozione:
     :return:
     '''
-    tipo='parola'
-    emozione='anger'
-    parole=dao.download_parole(emozione)
-    wordcloud=WordCloud(max_words=15).generate_from_frequencies(parole)
+
+    if tipo=='emoji':
+        tokens=dao.download_emojis(emozione)
+    elif tipo=='parola':
+        tokens=dao.download_parole(emozione)
+    elif tipo=='emoticon':
+        tokens=dao.download_emoticons(emozione)
+    elif tipo=='hashtag':
+        tokens=dao.download_hashtags(emozione)
+    else:
+        raise Exception('Errore nel tipo')
+    wordcloud=WordCloud(max_words=15).generate_from_frequencies(tokens)
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
     plt.show()
 
+def test_print_wordclouds(dao):
+    tipo='hashtag'
+    emozione='anger'
+    print_wordclouds(dao,tipo,emozione)
 
 def test_insert_parola(dao):
     res=dao.upload_words(["parola"],"anger")
@@ -192,4 +204,4 @@ if __name__ == '__main__':
 
     # insert_tokens(dao,'anger',use_backup=USE_BACKUP)
     # test_aggregate_mongo(dao,DROP)
-    print_wordclouds(dao)
+    test_print_wordclouds(dao)
