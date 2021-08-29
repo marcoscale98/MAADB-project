@@ -22,8 +22,8 @@ def _reduce(lista):
     diz=dict()
     for k,v in it:
         length=sum(1 for el in v)
-        print(f'chiave: {k}')
-        print(f'valore: {length}')
+        # print(f'chiave: {k}')
+        # print(f'valore: {length}')
         diz[k]=length
     return diz
 

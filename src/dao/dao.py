@@ -124,22 +124,22 @@ if __name__ == '__main__':
     from src.dao.mongodb_dao import MongoDBDAO
     from src.dao.mysql_dao import MySQLDAO
 
-    dao=MongoDBDAO(config.MONGO_CONFIG)
-    # dao=mysql_dao.MySQLDAO(config.MYSQL_CONFIG)
+    # dao=MongoDBDAO(config.MONGO_CONFIG)
+    dao=MySQLDAO(config.MYSQL_CONFIG)
     # dao.test_connessione()
+    # dao._test_download_messaggi()
     # dao._test_insert_parola()
     # dao._test_insert_emoji()
     # dao._test_insert_emoticon()
     # dao._test_insert_hashtag()
-    # dao._test_download_messaggi()
 
-    # emojis = dao.download_emojis('anger', limit=10)
-    # emoticons = dao.download_emoticons('anger', limit=10)
-    # parole = dao.download_parole('anger', limit=10)
-    # hashtags = dao.download_hashtags('anger', limit=10)
-    # pprint(emojis, indent=2)
-    # pprint(emoticons, indent=2)
-    # pprint(parole, indent=2)
-    # pprint(hashtags, indent=2)
+    emojis = dao.download_emojis('anger', limit=10)
+    emoticons = dao.download_emoticons('anger', limit=10)
+    parole = dao.download_parole('anger', limit=10)
+    hashtags = dao.download_hashtags('anger', limit=10)
+    pprint(emojis, indent=2)
+    pprint(emoticons, indent=2)
+    pprint(parole, indent=2)
+    pprint(hashtags, indent=2)
 
 

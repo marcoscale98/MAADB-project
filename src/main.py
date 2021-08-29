@@ -107,17 +107,17 @@ def insert_tokens(dao:DAO,emozione, limit=None,use_backup=False,drop=False):
         print('Inizio mapping')
         hashtags,emoticons,emojis,parole=_map(tweet_preprocessati)
 
-        n = dao.upload_emoji(emojis, emozione)
-        print(f'{n} emojis inserite')
+    n = dao.upload_emoji(emojis, emozione)
+    print(f'{n} emojis inserite')
 
-        n = dao.upload_hashtags(hashtags, emozione)
-        print(f'{n} hashtags inseriti')
+    n = dao.upload_hashtags(hashtags, emozione)
+    print(f'{n} hashtags inseriti')
 
-        n = dao.upload_emoticons(emoticons, emozione)
-        print(f'{n} emoticons inserite')
+    n = dao.upload_emoticons(emoticons, emozione)
+    print(f'{n} emoticons inserite')
 
-        n = dao.upload_words(parole, emozione)
-        print(f'{n} parole inserite')
+    n = dao.upload_words(parole, emozione)
+    print(f'{n} parole inserite')
 
 
 def preprocessing_tweets(dao, emozione, limit, use_backup):
@@ -178,8 +178,8 @@ def pipeline(dao,drop,use_backup):
 if __name__ == '__main__':
     DROP = True
     USE_BACKUP=True
-    dao = MongoDBDAO(config.MONGO_CONFIG)
-    # dao = MySQLDAO(MYSQL_CONFIG)
+    # dao = MongoDBDAO(config.MONGO_CONFIG)
+    dao = MySQLDAO(config.MYSQL_CONFIG)
 
     pipeline(dao,DROP,USE_BACKUP)
 
