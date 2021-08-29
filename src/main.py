@@ -133,7 +133,10 @@ def print_wordclouds(dao:DAO,tipo:str,emozione:str):
     '''
 
     if tipo=='emoji':
+        d = os.path.dirname(__file__) if "__file__" in locals() else os.getcwd()
+        font_path = os.path.join(os.getcwd(),'res', 'font', 'Symbola.ttf')
         tokens=dao.download_emojis(emozione)
+        wordcloud = WordCloud(max_words=15, font_path=font_path).generate_from_frequencies(tokens)
     elif tipo=='parola':
         tokens=dao.download_parole(emozione)
     elif tipo=='emoticon':
@@ -142,13 +145,14 @@ def print_wordclouds(dao:DAO,tipo:str,emozione:str):
         tokens=dao.download_hashtags(emozione)
     else:
         raise Exception('Errore nel tipo')
-    wordcloud=WordCloud(max_words=15).generate_from_frequencies(tokens)
+    if tipo!='emoji':
+        wordcloud=WordCloud(max_words=15).generate_from_frequencies(tokens)
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
     plt.show()
 
 def test_print_wordclouds(dao):
-    tipo='hashtag'
+    tipo='emoji'
     emozione='anger'
     print_wordclouds(dao,tipo,emozione)
 
