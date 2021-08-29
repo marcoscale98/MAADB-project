@@ -279,7 +279,6 @@ class MongoDBDAO(DAO):
             ]
             conn=self._connect("token_twitter",emozione)
             res=conn.aggregate(stages)
-            print(list(res))
             self._disconnect(conn)
 
 if __name__ == '__main__':

@@ -1,11 +1,13 @@
 import json
 import os
+import time
 from itertools import chain, tee
 from wordcloud import wordcloud, WordCloud
 import matplotlib.pyplot as plt
 
-from src.aggregazione.mongodb.aggregazione import aggregazione
-from src.aggregazione.mysql.aggregazione import aggregate
+from src.aggregazione.mongodb.aggregazione import aggregazione as aggregazione_mongo
+from src.aggregazione.mysql.aggregazione import aggregazione as aggregazione_mysql
+
 from src.dao.mongodb_dao import MongoDBDAO
 from src.dao.mysql_dao import MySQLDAO
 from src.dao.dao import DAO
@@ -84,23 +86,26 @@ def _map(tweets_prep):
     parole_list_flat = chain.from_iterable(list(parole))
     return list(hashtags), list(emoticons), list(emojis), list(parole_list_flat)
 
-def insert_tokens(dao:DAO,emozione, limit=None,use_backup=False):
-    prep=Preprocessing()
-    if use_backup:
-        tweets_preprocessati=prep.load_preprocessed('tweet_preprocessed')
-    else:
-        print('scarico tweets')
-        messaggi=dao.download_messaggi_twitter(emozione=emozione,limit=limit)
-        print('preprocesso tweets')
-        tweet_preprocessati=prep.preprocessing_text((t['message'] for t in messaggi))
-        prep.save_preprocessing(tweet_preprocessati,'tweet_preprocessed')
-        if type(dao)==MySQLDAO:
-            print('aggrego tweets')
-            hashtags,emoticons,emojis,parole=aggregate(tweet_preprocessati)
-        elif type(dao)==MongoDBDAO:
+def insert_tokens(dao:DAO,emozione, limit=None,use_backup=False,drop=False):
+    '''
+    scarica i messaggi twitter, li preprocessa, li aggrega (nel caso di mysql) e poi fa upload
+    :param dao:
+    :param emozione:
+    :param limit:
+    :param use_backup:
+    :param drop:
+    :return:
+    '''
+    tweet_preprocessati = preprocessing_tweets(dao, emozione, limit, use_backup)
+
+    if type(dao)==MySQLDAO:
+        print('aggrego tweets')
+        hashtags,emoticons,emojis,parole=aggregazione_mysql(tweet_preprocessati)
+    elif type(dao)==MongoDBDAO:
+        if drop:
             dao._drop_if_not_empty(Nomi_db_mongo.TOKEN_TWITTER.value, 'anger')
-            print('Inizio map')
-            hashtags,emoticons,emojis,parole=_map(tweet_preprocessati)
+        print('Inizio mapping')
+        hashtags,emoticons,emojis,parole=_map(tweet_preprocessati)
 
         n = dao.upload_emoji(emojis, emozione)
         print(f'{n} emojis inserite')
@@ -113,6 +118,20 @@ def insert_tokens(dao:DAO,emozione, limit=None,use_backup=False):
 
         n = dao.upload_words(parole, emozione)
         print(f'{n} parole inserite')
+
+
+def preprocessing_tweets(dao, emozione, limit, use_backup):
+    prep = Preprocessing()
+    if use_backup:
+        tweet_preprocessati = prep.load_preprocessed('tweet_preprocessed')
+    else:
+        print('scarico tweets')
+        messaggi = dao.download_messaggi_twitter(emozione=emozione, limit=limit)
+        print('preprocesso tweets')
+        tweet_preprocessati = prep.preprocessing_text((t['message'] for t in messaggi))
+        prep.save_preprocessing(tweet_preprocessati, 'tweet_preprocessed')
+    return tweet_preprocessati
+
 
 def print_wordclouds(dao:DAO,tipo:str,emozione:str):
     '''
@@ -146,13 +165,24 @@ def test_print_wordclouds(dao):
     emozione='anger'
     print_wordclouds(dao,tipo,emozione)
 
-
+def pipeline(dao,drop,use_backup):
+    populate_db_lexres(dao,drop)
+    populate_db_twitter(dao,drop)
+    emozione='anger'
+    insert_tokens(dao,emozione,use_backup=use_backup,drop=drop)
+    if type(dao)==MongoDBDAO:
+        aggregazione_mongo(dao,emozione,drop)
+    for tipo in ('emoji','parola','hashtag','emoticon'):
+        print_wordclouds(dao,tipo,emozione)
 
 if __name__ == '__main__':
     DROP = True
-    USE_BACKUP=False
+    USE_BACKUP=True
     dao = MongoDBDAO(config.MONGO_CONFIG)
     # dao = MySQLDAO(MYSQL_CONFIG)
+
+    pipeline(dao,DROP,USE_BACKUP)
+
     # test_connessione(dao)
     # populate_db_lexres(dao,DROP)
     # populate_db_twitter(dao, DROP)
@@ -164,4 +194,4 @@ if __name__ == '__main__':
 
     # insert_tokens(dao,'anger',use_backup=USE_BACKUP)
     # test_aggregate_mongo(dao,DROP)
-    test_print_wordclouds(dao)
+    # test_print_wordclouds(dao)

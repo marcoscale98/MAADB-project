@@ -153,34 +153,25 @@ class Preprocessing():
         with open(file, mode) as fp:
             objs = json.load(fp)
         return objs
+
+    def _test_preprocessing(self):
+        def frasi():
+            yield "I love you :)"
+            yield "I hate you 😡"
+            yield "My dog wants to eat #lunchtime"
+        gen=frasi()
+        res=self.preprocessing_text(gen)
+        pprint.pprint(res,indent=2)
+        return res
+
+    def _test_save_and_load(self):
+        res=self._test_preprocessing()
+        self.save_preprocessing(res,'prova')
+        dati_salvati=self.load_preprocessed('prova')
+        pprint.pprint(dati_salvati)
+
 if __name__ == '__main__':
-    # print(self.nlp.pipe_names)
-    #
-    # client = MongoClient()
-    # db = client['buffer_twitter_messages']
-    # coll = db['anger']
-    # db_tokens = client['twitter_words'].drop_collection("anger")
-    # frasi = coll.find({}).limit(60000)
-    # frasi: Generator = (frase['message'] for frase in frasi)
-    # # frasi = [{'message': 'Pen is on the table!'}]
-    # tweet_analizzati = preprocessing_text(frasi)
-    # print("Finito preprocessing")
-    # lista = tweet_analizzati.values()
-    # hashtags = [ogg for sotto_lista in lista for ogg in sotto_lista['hashtags']]
-    # upload_hashtags(hashtags, 'anger')
-    # print(f'Caricati hashtags')
-    # emojis = [ogg for sotto_lista in lista for ogg in sotto_lista['emojis']]
-    # upload_emoji(emojis, 'anger')
-    # print(f'Caricati emojis')
-    # tokens = [ogg for sotto_lista in lista for ogg in sotto_lista['parole']]
-    # upload_words(tokens, 'anger')
-    # print(f'Caricati tokens')
-    # emoticons = [ogg for sotto_lista in lista for ogg in sotto_lista['emoticons']]
-    # upload_emoticons(emoticons, 'anger')
-    # print(f'Caricati emoticons')
-    # if DEBUG:
-    #     pprint.pprint(hashtags)
-    #     pprint.pp(emoticons)
-    #     pprint.pp(emojis)
-    #     pprint.pp(tokens)
-    pass
+    prep=Preprocessing()
+    # prep._test_preprocessing()
+    prep._test_save_and_load()
+    # pass

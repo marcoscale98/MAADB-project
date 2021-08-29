@@ -1,8 +1,8 @@
+from pprint import pprint
 from typing import Union, List, Optional, Generator
 
 from pymongo.database import Database
 
-from src.dao import mongodb_dao, mysql_dao
 from src.user_exception.interface_exceptions import InterfaceException
 from src.utils import config
 
@@ -110,21 +110,36 @@ class DAO:
         res = dao.upload_emoticons([':)'], 'anger')
         print(f'Inseriti {res} emoticon')
 
-    def _test_get_messaggi(dao):
-        emozione = 'anger'
-        gen = dao.download_messaggi_twitter(emozione)
-        for mess in gen:
-            print(mess)
+
+    def _test_download_messaggi(self):
+        messaggi = self.download_messaggi_twitter('anger', 10)
+        pprint(list(messaggi))
+
+    def _test_download_tutti_messaggi(self):
+        messaggi = self.download_messaggi_twitter('anger')
+        pprint(f"Messaggi scaricati {len(list(messaggi))}")
 
 
 if __name__ == '__main__':
-    dao=mongodb_dao.MongoDBDAO(config.MONGO_CONFIG)
-    dao=mysql_dao.MySQLDAO(config.MYSQL_CONFIG)
-    dao.test_connessione()
-    dao._test_insert_parola()
-    dao._test_insert_emoji()
-    dao._test_insert_emoticon()
-    dao._test_insert_hashtag()
-    dao._test_get_messaggi()
+    from src.dao.mongodb_dao import MongoDBDAO
+    from src.dao.mysql_dao import MySQLDAO
+
+    dao=MongoDBDAO(config.MONGO_CONFIG)
+    # dao=mysql_dao.MySQLDAO(config.MYSQL_CONFIG)
+    # dao.test_connessione()
+    # dao._test_insert_parola()
+    # dao._test_insert_emoji()
+    # dao._test_insert_emoticon()
+    # dao._test_insert_hashtag()
+    # dao._test_download_messaggi()
+
+    # emojis = dao.download_emojis('anger', limit=10)
+    # emoticons = dao.download_emoticons('anger', limit=10)
+    # parole = dao.download_parole('anger', limit=10)
+    # hashtags = dao.download_hashtags('anger', limit=10)
+    # pprint(emojis, indent=2)
+    # pprint(emoticons, indent=2)
+    # pprint(parole, indent=2)
+    # pprint(hashtags, indent=2)
 
 

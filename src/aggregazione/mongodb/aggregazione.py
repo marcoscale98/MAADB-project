@@ -1,4 +1,4 @@
-from src.dao.mongodb_dao import *
+from src.dao.mongodb_dao import MongoDBDAO
 from src.utils import config
 
 
@@ -11,6 +11,6 @@ def test_aggregate_mongo(mongo_dao:MongoDBDAO,drop_if_not_empty=False):
     aggregazione(mongo_dao,'anger',drop_if_not_empty)
 
 if __name__ == '__main__':
-    dao=mongodb_dao.MongoDAO(config.MONGO_CONFIG)
+    dao=MongoDBDAO(config.MONGO_CONFIG)
     test_aggregate_mongo(dao,True)
 

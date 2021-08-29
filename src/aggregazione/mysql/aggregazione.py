@@ -12,7 +12,7 @@ from typing import Generator, Iterator
 from itertools import chain
 
 from src.dao.mysql_dao import MySQLDAO
-from src.preprocessing_text.preprocessing_text import preprocessing_text
+from src.preprocessing_text.preprocessing_text import Preprocessing
 from src.utils import nomi_db_emozioni,config
 
 
@@ -28,7 +28,7 @@ def _reduce(lista):
     return diz
 
 
-def aggregate(tweets_prep:Iterator):
+def aggregazione(tweets_prep:Iterator):
     '''
     restituisce una quadrupla di dizionari del tipo <parola,quantità>
     la quadrupla: hashtags,emoticons,emojis,parole
@@ -60,8 +60,9 @@ def test_agggregate():
     dao=MySQLDAO(config.MYSQL_CONFIG)
     gen_mess=dao.download_messaggi_twitter('anger',10)
     gen_mess=(tweet['message'] for tweet in gen_mess)
-    tweets_prep=preprocessing_text(gen_mess)
-    hashtags,emoticons,emojis,parole=aggregate(tweets_prep.values())
+    prep=Preprocessing()
+    tweets_prep=prep(gen_mess)
+    hashtags,emoticons,emojis,parole=aggregazione(tweets_prep.values())
     print('HASHTAGS')
     pprint(hashtags, indent=2)
     print('EMOJIS')
