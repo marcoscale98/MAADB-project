@@ -1,6 +1,8 @@
 import json
 import os
 from itertools import chain, tee
+from wordcloud import wordcloud, WordCloud
+import matplotlib.pyplot as plt
 
 from src.aggregazione.mongodb.aggregazione import aggregazione
 from src.aggregazione.mysql.aggregazione import aggregate
@@ -122,6 +124,21 @@ def insert_tokens(dao:DAO,emozione, limit=None,use_backup=False):
         n = dao.upload_words(parole, emozione)
         print(f'{n} parole inserite')
 
+def print_wordclouds(dao:DAO):
+    '''
+    disegna la word cloud dei token più utilizzati nei tweets dell' *emozione* data
+    :param tipo: 'emoji','emoticon','parola','hashtag'
+    :param emozione:
+    :return:
+    '''
+    tipo='parola'
+    emozione='anger'
+    parole=dao.download_parole(emozione)
+    wordcloud=WordCloud(max_words=15).generate_from_frequencies(parole)
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis("off")
+    plt.show()
+
 
 def test_insert_parola(dao):
     res=dao.upload_words(["parola"],"anger")
@@ -174,4 +191,5 @@ if __name__ == '__main__':
     # test_insert_hashtag(dao)
 
     # insert_tokens(dao,'anger',use_backup=USE_BACKUP)
-    test_aggregate_mongo(dao,DROP)
+    # test_aggregate_mongo(dao,DROP)
+    print_wordclouds(dao)
