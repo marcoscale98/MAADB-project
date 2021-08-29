@@ -139,7 +139,8 @@ class MongoDBDAO(DAO):
     def test_connessione(self):
         conn=self._connect("test","test")
         self._disconnect(conn)
-        return True
+        print("Connessione avvenuta con successo")
+
     def _test_download_messaggi(self):
         messaggi=self.download_messaggi_twitter('anger',10)
         pprint(list(messaggi))
@@ -206,6 +207,19 @@ class MongoDBDAO(DAO):
             res[obj['token']] = obj['quantita']
         self._disconnect(coll)
         return res
+
+    def _test_insert_parola(dao):
+        super()._test_insert_parola()
+
+    def _test_insert_hashtag(dao):
+        super()._test_insert_hashtag()
+
+    def _test_insert_emoji(dao):
+        super()._test_insert_emoji()
+
+    def _test_insert_emoticon(dao):
+        super()._test_insert_emoticon()
+
     def download_hashtags(self,emozione,limit=0) -> dict:
         '''
 

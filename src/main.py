@@ -9,6 +9,7 @@ from src.aggregazione.mysql.aggregazione import aggregate
 from src.dao.mongodb_dao import MongoDBDAO
 from src.dao.mysql_dao import MySQLDAO
 from src.dao.dao import DAO
+from src.preprocessing_text.preprocessing_text import Preprocessing
 from src.utils import config
 from src.utils.nomi_db_emozioni import Emotions, Nomi_db_mongo
 from src.preprocessing_text import preprocessing_text
@@ -70,18 +71,6 @@ def populate_db_twitter(dao, drop_if_not_empty:bool=False):
             drop_if_not_empty=False
         print(f'Inseriti {res_insert} messaggi dell\'emozione {em}')
 
-def test_get_messaggi(dao,emozione=None):
-    if emozione is None:
-        emozione='anger'
-    gen=dao.download_messaggi_twitter(emozione)
-    for mess in gen:
-        print(mess)
-
-def test_connessione(dao):
-    res=dao.test_connessione()
-    if res:
-        print("Connessione avvenuta con successo")
-
 def _map(tweets_prep):
     tweets_prep=tweets_prep.values()
     gen_hash, gen_emoji, gen_emot, gen_parole = tee(tweets_prep, 4)
@@ -96,14 +85,15 @@ def _map(tweets_prep):
     return list(hashtags), list(emoticons), list(emojis), list(parole_list_flat)
 
 def insert_tokens(dao:DAO,emozione, limit=None,use_backup=False):
+    prep=Preprocessing()
     if use_backup:
-        tweets_preprocessati=load_preprocessed('tweet_preprocessed')
+        tweets_preprocessati=prep.load_preprocessed('tweet_preprocessed')
     else:
         print('scarico tweets')
         messaggi=dao.download_messaggi_twitter(emozione=emozione,limit=limit)
         print('preprocesso tweets')
-        tweet_preprocessati=preprocessing_text.preprocessing_text((t['message'] for t in messaggi))
-        save_preprocessing(tweet_preprocessati,'tweet_preprocessed')
+        tweet_preprocessati=prep.preprocessing_text((t['message'] for t in messaggi))
+        prep.save_preprocessing(tweet_preprocessati,'tweet_preprocessed')
         if type(dao)==MySQLDAO:
             print('aggrego tweets')
             hashtags,emoticons,emojis,parole=aggregate(tweet_preprocessati)
@@ -156,41 +146,7 @@ def test_print_wordclouds(dao):
     emozione='anger'
     print_wordclouds(dao,tipo,emozione)
 
-def test_insert_parola(dao):
-    res=dao.upload_words(["parola"],"anger")
-    print(f"Inserito {res} parole")
 
-def test_insert_hashtag(dao):
-    res=dao.upload_hashtags(["#hashtag"],'anger')
-    print(f"Inserito {res} hashtags")
-
-def test_insert_emoji(dao):
-    res=dao.upload_emoji(['😀'],'anger')
-    print(f'Inseriti {res} emoji')
-
-def test_insert_emoticon(dao):
-    res=dao.upload_emoticons([':)'],'anger')
-    print(f'Inseriti {res} emoticon')
-
-def test_aggregate_mongo(mongo_dao:MongoDBDAO,drop_if_not_empty=False):
-    aggregazione(mongo_dao,'anger',drop_if_not_empty)
-
-def save_preprocessing(lista,tipo):
-    cartella='src/preprocessing_text/json/'
-    file=cartella+tipo+'.json'
-    mode='w'
-    if not os.path.exists(file):
-        mode='x'
-    with open(file,mode) as fp:
-        json.dump(lista,fp)
-
-def load_preprocessed(tipo):
-    cartella = 'src/preprocessing_text/json/'
-    file = cartella + tipo + '.json'
-    mode = 'r'
-    with open(file,mode) as fp:
-        objs=json.load(fp)
-    return objs
 
 if __name__ == '__main__':
     DROP = True

@@ -2,7 +2,10 @@ from typing import Union, List, Optional, Generator
 
 from pymongo.database import Database
 
+from src.dao import mongodb_dao, mysql_dao
 from src.user_exception.interface_exceptions import InterfaceException
+from src.utils import config
+
 
 class DAO:
     """
@@ -90,4 +93,38 @@ class DAO:
         :return: dict=<token,quantita>
         '''
         raise InterfaceException
+
+    def _test_insert_parola(dao):
+        res = dao.upload_words(["parola"], "anger")
+        print(f"Inserito {res} parole")
+
+    def _test_insert_hashtag(dao):
+        res = dao.upload_hashtags(["#hashtag"], 'anger')
+        print(f"Inserito {res} hashtags")
+
+    def _test_insert_emoji(dao):
+        res = dao.upload_emoji(['😀'], 'anger')
+        print(f'Inseriti {res} emoji')
+
+    def _test_insert_emoticon(dao):
+        res = dao.upload_emoticons([':)'], 'anger')
+        print(f'Inseriti {res} emoticon')
+
+    def _test_get_messaggi(dao):
+        emozione = 'anger'
+        gen = dao.download_messaggi_twitter(emozione)
+        for mess in gen:
+            print(mess)
+
+
+if __name__ == '__main__':
+    dao=mongodb_dao.MongoDBDAO(config.MONGO_CONFIG)
+    dao=mysql_dao.MySQLDAO(config.MYSQL_CONFIG)
+    dao.test_connessione()
+    dao._test_insert_parola()
+    dao._test_insert_emoji()
+    dao._test_insert_emoticon()
+    dao._test_insert_hashtag()
+    dao._test_get_messaggi()
+
 

@@ -162,7 +162,6 @@ class MySQLDAO(DAO):
         conn=self._connect("test","test")
         self._disconnect(conn)
         print("Connessione effettuata con successo")
-        return True
 
     def _test_download_messaggi(self):
         messaggi=self.download_messaggi_twitter('anger',10)
@@ -212,6 +211,18 @@ class MySQLDAO(DAO):
         for obj in cursor:
             res[obj[0]]=obj[2]
         return res
+
+    def _test_insert_parola(dao):
+        super()._test_insert_parola()
+
+    def _test_insert_hashtag(dao):
+        super()._test_insert_hashtag()
+
+    def _test_insert_emoji(dao):
+        super()._test_insert_emoji()
+
+    def _test_insert_emoticon(dao):
+        super()._test_insert_emoticon()
 
     def download_hashtags(self, emozione,limit:int=None) -> dict:
         conn=self._connect()
