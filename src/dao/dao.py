@@ -122,7 +122,7 @@ class DAO:
         messaggi = self.download_messaggi_twitter('anger')
         pprint(f"Messaggi scaricati {len(list(messaggi))}")
 
-    def download_parole_risorse_lessicali(self, emozione):
+    def download_parole_risorse_lessicali(self, emozione,risorsa):
         raise InterfaceException
 
 

@@ -1,3 +1,4 @@
+import itertools
 import json
 import os
 import time
@@ -171,6 +172,8 @@ def make_histogram(dao:DAO, emozione:str):
     parole_tweets=dao.download_parole_tweets(emozione).keys()
     parole_tweets=set().union(parole_tweets)
     print(f'{emozione}')
+    percentuali=[]
+    etichette=[]
     for res in Risorse:
         res=res.value
         parole_res=dao.download_parole_risorse_lessicali(emozione,res)
@@ -178,7 +181,11 @@ def make_histogram(dao:DAO, emozione:str):
             continue
         parole_res=set().union(list(map(lambda tupla:tupla[0] ,parole_res)))
         intersezione=parole_tweets.intersection(parole_res)
-        print(f'Percentuale di parole_shared/parole_res per la risorsa {res}: {len(intersezione)/len(parole_res)}' )
+        perc=len(intersezione)/len(parole_res)
+        percentuali.append(perc)
+        etichette.append(f'{emozione}-{res}')
+        print(f'Percentuale di parole_shared/parole_res per la risorsa {res}: {perc}')
+    return etichette,percentuali
 
 def pipeline(dao,drop,use_backup):
     populate_db_lexres(dao,drop)
@@ -202,10 +209,15 @@ def delete_database(dao):
 
 
 def make_histograms(dao):
+    etichette2,percentuali2=[],[]
     for em in Emotions:
         em=em.value
-        make_histogram(dao,em)
-
+        etichette,percentuali=make_histogram(dao,em)
+        etichette2.extend(etichette)
+        percentuali2.extend(percentuali)
+    plt.barh(etichette2,percentuali2)
+    plt.autoscale(True)
+    plt.show()
 
 if __name__ == '__main__':
     DROP = False
