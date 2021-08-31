@@ -12,8 +12,8 @@ from src.dao.mongodb_dao import MongoDBDAO
 from src.dao.mysql_dao import MySQLDAO
 from src.dao.dao import DAO
 from src.preprocessing_text.preprocessing_text import Preprocessing
-from src.utils import config
-from src.utils.nomi_db_emozioni import Emotions, Nomi_db_mongo
+from src.utils import config, nomi_db_emozioni
+from src.utils.nomi_db_emozioni import Emotions, Nomi_db_mongo, Risorse
 from src.preprocessing_text import preprocessing_text
 
 
@@ -121,15 +121,15 @@ def insert_tokens(dao:DAO,emozione, limit=None,use_backup=False,drop=False):
 
 
 def preprocessing_tweets(dao, emozione, limit, use_backup):
-    prep = Preprocessing()
+    prep = Preprocessing(emozione)
     if use_backup:
-        tweet_preprocessati = prep.load_preprocessed('tweet_preprocessed')
+        tweet_preprocessati = prep.load_preprocessed()
     else:
         print('scarico tweets')
         messaggi = dao.download_messaggi_twitter(emozione=emozione, limit=limit)
         print('preprocesso tweets')
         tweet_preprocessati = prep.preprocessing_text((t['message'] for t in messaggi))
-        prep.save_preprocessing(tweet_preprocessati, 'tweet_preprocessed')
+        prep.save_preprocessing(tweet_preprocessati)
     return tweet_preprocessati
 
 
@@ -147,7 +147,7 @@ def print_wordclouds(dao:DAO,tipo:str,emozione:str):
         tokens=dao.download_emojis(emozione)
         wordcloud = WordCloud(max_words=15, font_path=font_path).generate_from_frequencies(tokens)
     elif tipo=='parola':
-        tokens=dao.download_parole(emozione)
+        tokens=dao.download_parole_tweets(emozione)
     elif tipo=='emoticon':
         tokens=dao.download_emoticons(emozione)
     elif tipo=='hashtag':
@@ -157,33 +157,66 @@ def print_wordclouds(dao:DAO,tipo:str,emozione:str):
     if tipo!='emoji':
         wordcloud=WordCloud(max_words=15).generate_from_frequencies(tokens)
     plt.imshow(wordcloud, interpolation='bilinear')
+    plt.title(f'{str.capitalize(emozione)} : {str.capitalize(tipo)}')
     plt.axis("off")
     plt.show()
+
+def make_histogram(dao:DAO, emozione:str):
+    '''
+    - scarico le parole presenti nei tweets di una emozione
+    - scarico le parole presenti nelle risorse lessicali in una emozione
+    - trovo l'intersezione tra le 2
+    :return:
+    '''
+    parole_tweets=dao.download_parole_tweets(emozione).keys()
+    parole_tweets=set().union(parole_tweets)
+    print(f'{emozione}')
+    for res in Risorse:
+        res=res.value
+        parole_res=dao.download_parole_risorse_lessicali(emozione,res)
+        if len(parole_res)==0:
+            continue
+        parole_res=set().union(list(map(lambda tupla:tupla[0] ,parole_res)))
+        intersezione=parole_tweets.intersection(parole_res)
+        print(f'Percentuale di parole_shared/parole_res per la risorsa {res}: {len(intersezione)/len(parole_res)}' )
+
+def pipeline(dao,drop,use_backup):
+    populate_db_lexres(dao,drop)
+    populate_db_twitter(dao,drop)
+    for emozione in nomi_db_emozioni.Emotions:
+        emozione=emozione.value
+        print(f'\nEmozione: {emozione}')
+        insert_tokens(dao,emozione,use_backup=use_backup,drop=drop)
+        if type(dao)==MongoDBDAO:
+            aggregazione_mongo(dao,emozione,drop)
+        for tipo in ('emoji','parola','hashtag','emoticon'):
+            print_wordclouds(dao,tipo,emozione)
 
 def test_print_wordclouds(dao):
     tipo='emoji'
     emozione='anger'
     print_wordclouds(dao,tipo,emozione)
 
-def pipeline(dao,drop,use_backup):
-    populate_db_lexres(dao,drop)
-    populate_db_twitter(dao,drop)
-    emozione='anger'
-    insert_tokens(dao,emozione,use_backup=use_backup,drop=drop)
-    if type(dao)==MongoDBDAO:
-        aggregazione_mongo(dao,emozione,drop)
-    for tipo in ('emoji','parola','hashtag','emoticon'):
-        print_wordclouds(dao,tipo,emozione)
+def delete_database(dao):
+    dao.delete_database()
+
+
+def make_histograms(dao):
+    for em in Emotions:
+        em=em.value
+        make_histogram(dao,em)
+
 
 if __name__ == '__main__':
-    DROP = True
+    DROP = False
     USE_BACKUP=True
     # dao = MongoDBDAO(config.MONGO_CONFIG)
     dao = MySQLDAO(config.MYSQL_CONFIG)
 
-    pipeline(dao,DROP,USE_BACKUP)
-
-    # test_connessione(dao)
+    dao.test_connessione()
+    make_histograms(dao)
+    # delete_database(dao)
+    # pipeline(dao,DROP,USE_BACKUP)
     # populate_db_lexres(dao,DROP)
     # populate_db_twitter(dao, DROP)
     # dao._test_download_messaggi()

@@ -16,10 +16,11 @@ from res.Risorse_lessicali.emoji_emoticons.emoji_emoticons import posemoticons, 
 
 class Preprocessing():
 
-    def __init__(self) -> None:
+    def __init__(self,emozione) -> None:
         self.nlp = spacy.load('en_core_web_sm', disable=['ner'])
         self.nlp.disable_pipe("parser")
         self.nlp.enable_pipe("senter")
+        self.emozione=emozione
 
     def search_emoticons(self,frase: str) -> Tuple[str, List]:
         trovate = []
@@ -137,18 +138,20 @@ class Preprocessing():
         frase = frase.replace("USERNAME", "").replace("URL", "")
         return frase
 
-    def save_preprocessing(self,lista, tipo):
-        cartella = 'src/preprocessing_text/json/'
-        file = cartella + tipo + '.json'
+    def save_preprocessing(self,lista):
+        cartella = os.path.join('src','preprocessing_text','json',self.emozione)
+        if not os.path.exists(cartella):
+            os.mkdir(cartella)
+        file = os.path.join(cartella,'tweet_preprocessed.json')
         mode = 'w'
         if not os.path.exists(file):
             mode = 'x'
         with open(file, mode) as fp:
             json.dump(lista, fp)
 
-    def load_preprocessed(self,tipo):
-        cartella = 'src/preprocessing_text/json/'
-        file = cartella + tipo + '.json'
+    def load_preprocessed(self):
+        cartella = os.path.join('src','preprocessing_text','json')
+        file = os.path.join(cartella,self.emozione,'tweet_preprocessed.json')
         mode = 'r'
         with open(file, mode) as fp:
             objs = json.load(fp)
@@ -171,7 +174,7 @@ class Preprocessing():
         pprint.pprint(dati_salvati)
 
 if __name__ == '__main__':
-    prep=Preprocessing()
+    prep=Preprocessing('test')
     # prep._test_preprocessing()
     prep._test_save_and_load()
     # pass

@@ -123,11 +123,10 @@ class MongoDBDAO(DAO):
         while cond():
             if limit and max>limit:
                 max=limit
-            db = self._connect(Nomi_db_mongo.MESSAGGIO_TWITTER.value)
-            emozione_coll=db[emozione]
+            emozione_coll = self._connect(Nomi_db_mongo.MESSAGGIO_TWITTER.value,emozione)
             cursor=emozione_coll.find()[min:max]
             messaggi = list(cursor)
-            self._disconnect(db)
+            self._disconnect(emozione_coll)
             min += 100
             max += 100
             if len(messaggi)==0:
@@ -140,13 +139,6 @@ class MongoDBDAO(DAO):
         conn=self._connect("test","test")
         self._disconnect(conn)
         print("Connessione avvenuta con successo")
-
-    def _test_download_messaggi(self):
-        messaggi=self.download_messaggi_twitter('anger',10)
-        pprint(list(messaggi))
-    def _test_download_tutti_messaggi(self):
-        messaggi=self.download_messaggi_twitter('anger')
-        pprint(f"Messaggi scaricati {len(list(messaggi))}")
 
     def download_emojis(self,emozione,limit=0) -> dict:
         '''
@@ -188,7 +180,7 @@ class MongoDBDAO(DAO):
         self._disconnect(coll)
         return res
 
-    def download_parole(self,emozione,limit=0) -> dict:
+    def download_parole_tweets(self, emozione, limit=0) -> dict:
         '''
 
         :param emozione:
@@ -207,6 +199,12 @@ class MongoDBDAO(DAO):
             res[obj['token']] = obj['quantita']
         self._disconnect(coll)
         return res
+
+    def delete_database(self):
+        for db_name in Nomi_db_mongo:
+            db:Database=self._connect(db_name.value)
+            db.client.drop_database(db)
+            self._disconnect(db)
 
     def _test_insert_parola(dao):
         super()._test_insert_parola()
@@ -290,7 +288,7 @@ if __name__ == '__main__':
     # mongodb_dao._test_download_tutti_messaggi()
     emojis=mongodb_dao.download_emojis('anger',limit=10)
     emoticons=mongodb_dao.download_emoticons('anger',limit=10)
-    parole=mongodb_dao.download_parole('anger',limit=10)
+    parole=mongodb_dao.download_parole_tweets('anger', limit=10)
     hashtags=mongodb_dao.download_hashtags('anger',limit=10)
     pprint(emojis,indent=2)
     pprint(emoticons,indent=2)

@@ -80,7 +80,7 @@ class DAO:
         '''
         raise InterfaceException
 
-    def download_parole(self,emozione)-> dict:
+    def download_parole_tweets(self, emozione)-> dict:
         '''
 
         :return: dict=<token,quantita>
@@ -92,6 +92,9 @@ class DAO:
 
         :return: dict=<token,quantita>
         '''
+        raise InterfaceException
+
+    def delete_database(self):
         raise InterfaceException
 
     def _test_insert_parola(dao):
@@ -106,10 +109,10 @@ class DAO:
         res = dao.upload_emoji(['😀'], 'anger')
         print(f'Inseriti {res} emoji')
 
+
     def _test_insert_emoticon(dao):
         res = dao.upload_emoticons([':)'], 'anger')
         print(f'Inseriti {res} emoticon')
-
 
     def _test_download_messaggi(self):
         messaggi = self.download_messaggi_twitter('anger', 10)
@@ -118,6 +121,9 @@ class DAO:
     def _test_download_tutti_messaggi(self):
         messaggi = self.download_messaggi_twitter('anger')
         pprint(f"Messaggi scaricati {len(list(messaggi))}")
+
+    def download_parole_risorse_lessicali(self, emozione):
+        raise InterfaceException
 
 
 if __name__ == '__main__':
@@ -135,7 +141,7 @@ if __name__ == '__main__':
 
     emojis = dao.download_emojis('anger', limit=10)
     emoticons = dao.download_emoticons('anger', limit=10)
-    parole = dao.download_parole('anger', limit=10)
+    parole = dao.download_parole_tweets('anger', limit=10)
     hashtags = dao.download_hashtags('anger', limit=10)
     pprint(emojis, indent=2)
     pprint(emoticons, indent=2)

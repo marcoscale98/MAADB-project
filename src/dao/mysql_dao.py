@@ -159,10 +159,18 @@ class MySQLDAO(DAO):
             yield mess
 
     def test_connessione(self):
-        conn=self._connect("test","test")
+        conn=self._connect()
         self._disconnect(conn)
         print("Connessione effettuata con successo")
 
+    def download_parole_risorse_lessicali(self, emozione, risorsa):
+        conn=self._connect()
+        cursor=conn.cursor()
+        query=f"select parola from {Nomi_db_mysql.RISORSA_LESSICALE.value} where emozione='{emozione}' and risorsa='{risorsa}'"
+        cursor.execute(query)
+        parole=cursor.fetchall()
+        self._disconnect(conn)
+        return parole
 
     def download_emojis(self, emozione,limit:int=None) -> dict:
         conn=self._connect()
@@ -192,7 +200,7 @@ class MySQLDAO(DAO):
             res[obj[0]]=obj[2]
         return res
 
-    def download_parole(self, emozione,limit:int=None) -> dict:
+    def download_parole_tweets(self, emozione, limit:int=None) -> dict:
         conn=self._connect()
         cursor=conn.cursor()
         query=f'SELECT * FROM {Nomi_db_mysql.PAROLA_CONTENUTA.value}'
@@ -205,18 +213,6 @@ class MySQLDAO(DAO):
         for obj in cursor:
             res[obj[0]]=obj[2]
         return res
-
-    def _test_insert_parola(dao):
-        super()._test_insert_parola()
-
-    def _test_insert_hashtag(dao):
-        super()._test_insert_hashtag()
-
-    def _test_insert_emoji(dao):
-        super()._test_insert_emoji()
-
-    def _test_insert_emoticon(dao):
-        super()._test_insert_emoticon()
 
     def download_hashtags(self, emozione,limit:int=None) -> dict:
         conn=self._connect()
@@ -231,3 +227,21 @@ class MySQLDAO(DAO):
         for obj in cursor:
             res[obj[0]]=obj[2]
         return res
+
+    def delete_database(self):
+        conn=self._connect()
+        cursor = conn.cursor()
+        cursor.execute("DROP DATABASE maadb_project")
+        self._disconnect(conn)
+
+    def _test_insert_parola(dao):
+        super()._test_insert_parola()
+
+    def _test_insert_hashtag(dao):
+        super()._test_insert_hashtag()
+
+    def _test_insert_emoji(dao):
+        super()._test_insert_emoji()
+
+    def _test_insert_emoticon(dao):
+        super()._test_insert_emoticon()
