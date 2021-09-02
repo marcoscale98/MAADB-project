@@ -135,6 +135,23 @@ class MongoDBDAO(DAO):
             for mess in messaggi:
                 yield mess
 
+    def download_parole_risorse_lessicali(self, emozione, risorsa=None)-> list:
+        collezione:Collection=self._connect(Nomi_db_mongo.RISORSA_LESSICALE.value,emozione)
+        if risorsa:
+            docs = collezione.find({f'res.{risorsa}':1})
+        else:
+            docs=collezione.find({})
+        docs=list(doc['lemma'] for doc in docs)
+        self._disconnect(collezione)
+        return docs
+
+
+    def upload_nuove_parole_tweets(self, parole, emozione):
+        coll = self._connect(Nomi_db_mongo.RISORSA_LESSICALE.value, emozione)
+        inserted = coll.insert_many([{'lemma': parola, 'res': {'nuova_risorsa':1}} for parola in parole])
+        self._disconnect(coll)
+        return len(inserted.inserted_ids)
+
     def test_connessione(self):
         conn=self._connect("test","test")
         self._disconnect(conn)
@@ -279,6 +296,10 @@ class MongoDBDAO(DAO):
             res=conn.aggregate(stages)
             self._disconnect(conn)
 
+    def _test_download_lemmi_lex_res(self):
+        parole=self.download_parole_risorse_lessicali('anger','EmoSN')
+        print(parole)
+
 if __name__ == '__main__':
     # pass
     mongodb_dao = MongoDBDAO(MONGO_CONFIG)
@@ -286,11 +307,12 @@ if __name__ == '__main__':
     # mongodb_dao.populate_db_lexres()
     # mongodb_dao._test_download_messaggi()
     # mongodb_dao._test_download_tutti_messaggi()
-    emojis=mongodb_dao.download_emojis('anger',limit=10)
-    emoticons=mongodb_dao.download_emoticons('anger',limit=10)
-    parole=mongodb_dao.download_parole_tweets('anger', limit=10)
-    hashtags=mongodb_dao.download_hashtags('anger',limit=10)
-    pprint(emojis,indent=2)
-    pprint(emoticons,indent=2)
-    pprint(parole,indent=2)
-    pprint(hashtags,indent=2)
+    # emojis=mongodb_dao.download_emojis('anger',limit=10)
+    # emoticons=mongodb_dao.download_emoticons('anger',limit=10)
+    # parole=mongodb_dao.download_parole_tweets('anger', limit=10)
+    # hashtags=mongodb_dao.download_hashtags('anger',limit=10)
+    # pprint(emojis,indent=2)
+    # pprint(emoticons,indent=2)
+    # pprint(parole,indent=2)
+    # pprint(hashtags,indent=2)
+    mongodb_dao._test_download_lemmi_lex_res()

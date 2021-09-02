@@ -133,7 +133,6 @@ def preprocessing_tweets(dao, emozione, limit, use_backup):
         prep.save_preprocessing(tweet_preprocessati)
     return tweet_preprocessati
 
-
 def print_wordclouds(dao:DAO,tipo:str,emozione:str):
     '''
     disegna la word cloud dei token più utilizzati nei tweets dell' *emozione* data
@@ -179,7 +178,7 @@ def make_histogram(dao:DAO, emozione:str):
         parole_res=dao.download_parole_risorse_lessicali(emozione,res)
         if len(parole_res)==0:
             continue
-        parole_res=set().union(list(map(lambda tupla:tupla[0] ,parole_res)))
+        parole_res=set().union(parole_res)
         intersezione=parole_tweets.intersection(parole_res)
         perc=len(intersezione)/len(parole_res)
         percentuali.append(perc)
@@ -187,7 +186,22 @@ def make_histogram(dao:DAO, emozione:str):
         print(f'Percentuale di parole_shared/parole_res per la risorsa {res}: {perc}')
     return etichette,percentuali
 
-def pipeline(dao,drop,use_backup):
+
+def trova_nuove_parole_nei_tweets(dao,emozione):
+    '''
+    si preoccupa di trovare l'intersezione tra parole nelle lexical resources e nei tweets
+    :param dao:
+    :return:
+    '''
+    parole_tweets = dao.download_parole_tweets(emozione).keys()
+    parole_tweets = set().union(parole_tweets)
+    parole_res = dao.download_parole_risorse_lessicali(emozione)
+    parole_res = set().union(parole_res)
+    nuove_parole = parole_tweets.difference(parole_res)
+    return nuove_parole
+
+
+def pipeline(dao:DAO,drop,use_backup):
     populate_db_lexres(dao,drop)
     populate_db_twitter(dao,drop)
     for emozione in nomi_db_emozioni.Emotions:
@@ -196,8 +210,17 @@ def pipeline(dao,drop,use_backup):
         insert_tokens(dao,emozione,use_backup=use_backup,drop=drop)
         if type(dao)==MongoDBDAO:
             aggregazione_mongo(dao,emozione,drop)
+        nuove_parole = trova_nuove_parole_nei_tweets(dao,emozione)
+        upload_nuove_parole_tweets(dao, emozione, nuove_parole)
         for tipo in ('emoji','parola','hashtag','emoticon'):
             print_wordclouds(dao,tipo,emozione)
+        make_histograms(dao)
+
+
+def upload_nuove_parole_tweets(dao, emozione, nuove_parole):
+    n_inserted = dao.upload_nuove_parole_tweets(nuove_parole, emozione)
+    print(f'Inserite {n_inserted} nuove parole')
+
 
 def test_print_wordclouds(dao):
     tipo='emoji'
@@ -206,7 +229,6 @@ def test_print_wordclouds(dao):
 
 def delete_database(dao):
     dao.delete_database()
-
 
 def make_histograms(dao):
     etichette2,percentuali2=[],[]
@@ -219,14 +241,21 @@ def make_histograms(dao):
     plt.autoscale(True)
     plt.show()
 
+
+def test_upload_nuove_parole(dao):
+    emozione='anger'
+    nuove_parole = trova_nuove_parole_nei_tweets(dao, emozione)
+    upload_nuove_parole_tweets(dao, emozione, nuove_parole)
+
+
 if __name__ == '__main__':
     DROP = False
     USE_BACKUP=True
-    # dao = MongoDBDAO(config.MONGO_CONFIG)
-    dao = MySQLDAO(config.MYSQL_CONFIG)
-
-    dao.test_connessione()
-    make_histograms(dao)
+    dao = MongoDBDAO(config.MONGO_CONFIG)
+    # dao = MySQLDAO(config.MYSQL_CONFIG)
+    test_upload_nuove_parole(dao)
+    # dao.test_connessione()
+    # make_histograms(dao)
     # delete_database(dao)
     # pipeline(dao,DROP,USE_BACKUP)
     # populate_db_lexres(dao,DROP)

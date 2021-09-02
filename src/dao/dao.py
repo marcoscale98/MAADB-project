@@ -125,6 +125,9 @@ class DAO:
     def download_parole_risorse_lessicali(self, emozione,risorsa):
         raise InterfaceException
 
+    def upload_nuove_parole_tweets(self, parole, emozione):
+        raise InterfaceException
+
 
 if __name__ == '__main__':
     from src.dao.mongodb_dao import MongoDBDAO

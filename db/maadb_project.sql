@@ -108,7 +108,7 @@ CREATE TABLE `parola_contenuta` (
 
 DROP TABLE IF EXISTS `risorsa_lessicale`;
 CREATE TABLE `risorsa_lessicale` (
-  `risorsa` enum('EmoSN','NRC','sentisense') NOT NULL,
+  `risorsa` enum('EmoSN','NRC','sentisense','nuova_risorsa') NOT NULL,
   `emozione` enum('anger','anticipation','disgust','fear','joy','sadness','surprise','trust') NOT NULL,
   `id` int(32) NOT NULL,
   `parola` varchar(20) NOT NULL

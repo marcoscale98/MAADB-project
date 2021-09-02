@@ -163,13 +163,26 @@ class MySQLDAO(DAO):
         self._disconnect(conn)
         print("Connessione effettuata con successo")
 
-    def download_parole_risorse_lessicali(self, emozione, risorsa):
+    def upload_nuove_parole_tweets(self, parole, emozione):
+        conn=self._connect(Nomi_db_mysql.RISORSA_LESSICALE.value,emozione)
+        cursor=conn.cursor()
+        query=f'INSERT IGNORE INTO {Nomi_db_mysql.RISORSA_LESSICALE.value} (parola,emozione,risorsa) values (%s,%s,%s)'
+        data=[(parola,emozione,'nuova_risorsa') for parola in parole]
+        cursor.executemany(query,data)
+        self._disconnect(conn)
+        return len(parole)
+
+
+    def download_parole_risorse_lessicali(self, emozione, risorsa=None):
         conn=self._connect()
         cursor=conn.cursor()
-        query=f"select parola from {Nomi_db_mysql.RISORSA_LESSICALE.value} where emozione='{emozione}' and risorsa='{risorsa}'"
+        query=f"select parola from {Nomi_db_mysql.RISORSA_LESSICALE.value} where emozione='{emozione}'"
+        if risorsa:
+            query+=f" and risorsa='{risorsa}'"
         cursor.execute(query)
         parole=cursor.fetchall()
         self._disconnect(conn)
+        parole=list(parola[0] for parola in parole)
         return parole
 
     def download_emojis(self, emozione,limit:int=None) -> dict:
