@@ -5,8 +5,12 @@ MYSQL_CONFIG = {
     'database':'maadb_project'
 }
 
+# per connettersi su mongo in locale
+# MONGO_CONFIG={
+#     'port':27017,
+# }
+
+#per connettersi su Mongo Atlas
 MONGO_CONFIG={
-    'port':27017,
+    'host': 'mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/'
 }
-#"mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000"
-#mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/

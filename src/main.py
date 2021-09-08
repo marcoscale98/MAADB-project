@@ -161,7 +161,7 @@ def print_wordclouds(dao:DAO,tipo:str,emozione:str):
     plt.axis("off")
     plt.show()
 
-def make_histogram(dao:DAO, emozione:str):
+def calcolo_parole_shared(dao:DAO, emozione:str):
     '''
     - scarico le parole presenti nei tweets di una emozione
     - scarico le parole presenti nelle risorse lessicali in una emozione
@@ -170,7 +170,7 @@ def make_histogram(dao:DAO, emozione:str):
     '''
     parole_tweets=dao.download_parole_tweets(emozione).keys()
     parole_tweets=set().union(parole_tweets)
-    print(f'{emozione}')
+    #print(f'{emozione}')
     percentuali=[]
     etichette=[]
     for res in Risorse:
@@ -183,9 +183,8 @@ def make_histogram(dao:DAO, emozione:str):
         perc=len(intersezione)/len(parole_res)
         percentuali.append(perc)
         etichette.append(f'{emozione}-{res}')
-        print(f'Percentuale di parole_shared/parole_res per la risorsa {res}: {perc}')
+        #print(f'Percentuale di parole_shared/parole_res per la risorsa {res}: {perc}')
     return etichette,percentuali
-
 
 def trova_nuove_parole_nei_tweets(dao,emozione):
     '''
@@ -214,7 +213,7 @@ def pipeline(dao:DAO,drop,use_backup):
         upload_nuove_parole_tweets(dao, emozione, nuove_parole)
         for tipo in ('emoji','parola','hashtag','emoticon'):
             print_wordclouds(dao,tipo,emozione)
-        make_histograms(dao)
+    make_histogram(dao)
 
 
 def upload_nuove_parole_tweets(dao, emozione, nuove_parole):
@@ -230,34 +229,38 @@ def test_print_wordclouds(dao):
 def delete_database(dao):
     dao.delete_database()
 
-def make_histograms(dao):
+def make_histogram(dao):
+    '''
+    crea un istogramma per visualizzare la percentuale di parole shared tra parole_tweets e parole_risorse, per ogni risorsa per ogni emozione
+    :param dao:
+    :return: plotta l'istogramma a barre
+    '''
     etichette2,percentuali2=[],[]
     for em in Emotions:
         em=em.value
-        etichette,percentuali=make_histogram(dao,em)
+        etichette,percentuali=calcolo_parole_shared(dao, em)
         etichette2.extend(etichette)
         percentuali2.extend(percentuali)
     plt.barh(etichette2,percentuali2)
     plt.autoscale(True)
     plt.show()
 
-
 def test_upload_nuove_parole(dao):
     emozione='anger'
     nuove_parole = trova_nuove_parole_nei_tweets(dao, emozione)
     upload_nuove_parole_tweets(dao, emozione, nuove_parole)
-
 
 if __name__ == '__main__':
     DROP = False
     USE_BACKUP=True
     dao = MongoDBDAO(config.MONGO_CONFIG)
     # dao = MySQLDAO(config.MYSQL_CONFIG)
-    test_upload_nuove_parole(dao)
+
     # dao.test_connessione()
+    pipeline(dao,DROP,USE_BACKUP)
+    # test_upload_nuove_parole(dao)
     # make_histograms(dao)
     # delete_database(dao)
-    # pipeline(dao,DROP,USE_BACKUP)
     # populate_db_lexres(dao,DROP)
     # populate_db_twitter(dao, DROP)
     # dao._test_download_messaggi()

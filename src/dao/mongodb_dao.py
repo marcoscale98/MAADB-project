@@ -138,7 +138,7 @@ class MongoDBDAO(DAO):
     def download_parole_risorse_lessicali(self, emozione, risorsa=None)-> list:
         collezione:Collection=self._connect(Nomi_db_mongo.RISORSA_LESSICALE.value,emozione)
         if risorsa:
-            docs = collezione.find({f'res.{risorsa}':1})
+            docs = collezione.find({f'risorse.{risorsa}':1})
         else:
             docs=collezione.find({})
         docs=list(doc['lemma'] for doc in docs)
@@ -148,7 +148,7 @@ class MongoDBDAO(DAO):
 
     def upload_nuove_parole_tweets(self, parole, emozione):
         coll = self._connect(Nomi_db_mongo.RISORSA_LESSICALE.value, emozione)
-        inserted = coll.insert_many([{'lemma': parola, 'res': {'nuova_risorsa':1}} for parola in parole])
+        inserted = coll.insert_many([{'lemma': parola, 'risorse': {'nuova_risorsa':1}} for parola in parole])
         self._disconnect(coll)
         return len(inserted.inserted_ids)
 
@@ -303,6 +303,7 @@ class MongoDBDAO(DAO):
 if __name__ == '__main__':
     # pass
     mongodb_dao = MongoDBDAO(MONGO_CONFIG)
+    mongodb_dao.test_connessione()
     # mongodb_dao.populate_db_twitter()
     # mongodb_dao.populate_db_lexres()
     # mongodb_dao._test_download_messaggi()
@@ -315,4 +316,4 @@ if __name__ == '__main__':
     # pprint(emoticons,indent=2)
     # pprint(parole,indent=2)
     # pprint(hashtags,indent=2)
-    mongodb_dao._test_download_lemmi_lex_res()
+    # mongodb_dao._test_download_lemmi_lex_res()

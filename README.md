@@ -68,7 +68,7 @@ Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:
 {
     _id: ObjectId(...),
     lemma:str,
-    res: {
+    risorse: {
         EmoSN: Optional[int],
         NRC: Optional[int],
         sentisense: Optional[int],
@@ -190,7 +190,9 @@ Quelle in grassetto sono le emozioni presenti anche nei file di `Twitter messagg
 > Admin
 
 #### url
+##### Atlas
 > mongodb+srv://admin:admin@cluster0.9ajjj.mongodb.net/
+##### Locale
 
 ### MySQL
 #### username
