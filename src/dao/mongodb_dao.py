@@ -9,7 +9,7 @@ from pymongo.results import InsertManyResult
 from src.dao.dao import DAO
 from src.utils.config import MONGO_CONFIG
 
-from src.utils.nomi_db_emozioni import Nomi_db_mongo
+from src.utils.nomi_db_emozioni import Nomi_db_mongo, Risorse
 
 
 class MongoDBDAO(DAO):
@@ -148,7 +148,7 @@ class MongoDBDAO(DAO):
 
     def upload_nuove_parole_tweets(self, parole, emozione):
         coll = self._connect(Nomi_db_mongo.RISORSA_LESSICALE.value, emozione)
-        inserted = coll.insert_many([{'lemma': parola, 'risorse': {'nuova_risorsa':1}} for parola in parole])
+        inserted = coll.insert_many([{'lemma': parola, 'risorse': {Risorse.nuova_risorsa.value:1}} for parola in parole])
         self._disconnect(coll)
         return len(inserted.inserted_ids)
 

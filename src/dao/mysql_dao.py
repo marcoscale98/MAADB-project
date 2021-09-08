@@ -11,7 +11,7 @@ import mysql.connector
 from mysql.connector import errorcode, MySQLConnection, IntegrityError
 
 from src.utils.config import MYSQL_CONFIG
-from src.utils.nomi_db_emozioni import Nomi_db_mysql
+from src.utils.nomi_db_emozioni import Nomi_db_mysql, Risorse
 
 
 class MySQLDAO(DAO):
@@ -167,7 +167,7 @@ class MySQLDAO(DAO):
         conn=self._connect(Nomi_db_mysql.RISORSA_LESSICALE.value,emozione)
         cursor=conn.cursor()
         query=f'INSERT IGNORE INTO {Nomi_db_mysql.RISORSA_LESSICALE.value} (parola,emozione,risorsa) values (%s,%s,%s)'
-        data=[(parola,emozione,'nuova_risorsa') for parola in parole]
+        data=[(parola,emozione,Risorse.nuova_risorsa.value) for parola in parole]
         cursor.executemany(query,data)
         self._disconnect(conn)
         return len(parole)

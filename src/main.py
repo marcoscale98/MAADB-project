@@ -120,7 +120,6 @@ def insert_tokens(dao:DAO,emozione, limit=None,use_backup=False,drop=False):
     n = dao.upload_words(parole, emozione)
     print(f'{n} parole inserite')
 
-
 def preprocessing_tweets(dao, emozione, limit, use_backup):
     prep = Preprocessing(emozione)
     if use_backup:
@@ -133,7 +132,7 @@ def preprocessing_tweets(dao, emozione, limit, use_backup):
         prep.save_preprocessing(tweet_preprocessati)
     return tweet_preprocessati
 
-def print_wordclouds(dao:DAO,tipo:str,emozione:str):
+def print_wordclouds(dao:DAO,tipo:str,emozione:str,save=False):
     '''
     disegna la word cloud dei token più utilizzati nei tweets dell' *emozione* data
     :param tipo: 'emoji','emoticon','parola','hashtag'
@@ -159,6 +158,9 @@ def print_wordclouds(dao:DAO,tipo:str,emozione:str):
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.title(f'{str.capitalize(emozione)} : {str.capitalize(tipo)}')
     plt.axis("off")
+    if save:
+        path=os.path.join('res','immagini_output',f'{emozione}-{tipo}.jpg')
+        plt.savefig(path)
     plt.show()
 
 def calcolo_parole_shared(dao:DAO, emozione:str):
@@ -174,6 +176,8 @@ def calcolo_parole_shared(dao:DAO, emozione:str):
     percentuali=[]
     etichette=[]
     for res in Risorse:
+        if res==Risorse.nuova_risorsa:
+            continue
         res=res.value
         parole_res=dao.download_parole_risorse_lessicali(emozione,res)
         if len(parole_res)==0:
@@ -200,7 +204,7 @@ def trova_nuove_parole_nei_tweets(dao,emozione):
     return nuove_parole
 
 
-def pipeline(dao:DAO,drop,use_backup):
+def pipeline(dao:DAO,drop,use_backup,save_images):
     populate_db_lexres(dao,drop)
     populate_db_twitter(dao,drop)
     for emozione in nomi_db_emozioni.Emotions:
@@ -209,27 +213,31 @@ def pipeline(dao:DAO,drop,use_backup):
         insert_tokens(dao,emozione,use_backup=use_backup,drop=drop)
         if type(dao)==MongoDBDAO:
             aggregazione_mongo(dao,emozione,drop)
+        for tipo in ('emoji','parola','hashtag','emoticon'):
+            print_wordclouds(dao,tipo,emozione,save_images)
+    display_istogramma(dao, save_images)
+    print('\n')
+    for emozione in nomi_db_emozioni.Emotions:
+        emozione=emozione.value
         nuove_parole = trova_nuove_parole_nei_tweets(dao,emozione)
         upload_nuove_parole_tweets(dao, emozione, nuove_parole)
-        for tipo in ('emoji','parola','hashtag','emoticon'):
-            print_wordclouds(dao,tipo,emozione)
-    make_histogram(dao)
 
+def display_wordclouds_istogramma(dao,save_images):
+    for emozione in nomi_db_emozioni.Emotions:
+        emozione=emozione.value
+        print(f'\nEmozione: {emozione}')
+        for tipo in ('emoji','parola','hashtag','emoticon'):
+            print_wordclouds(dao,tipo,emozione,save_images)
+    display_istogramma(dao, save_images)
 
 def upload_nuove_parole_tweets(dao, emozione, nuove_parole):
     n_inserted = dao.upload_nuove_parole_tweets(nuove_parole, emozione)
-    print(f'Inserite {n_inserted} nuove parole')
-
-
-def test_print_wordclouds(dao):
-    tipo='emoji'
-    emozione='anger'
-    print_wordclouds(dao,tipo,emozione)
+    print(f'Inserite {n_inserted} nuove parole per {emozione}')
 
 def delete_database(dao):
     dao.delete_database()
 
-def make_histogram(dao):
+def display_istogramma(dao, save=False):
     '''
     crea un istogramma per visualizzare la percentuale di parole shared tra parole_tweets e parole_risorse, per ogni risorsa per ogni emozione
     :param dao:
@@ -243,7 +251,15 @@ def make_histogram(dao):
         percentuali2.extend(percentuali)
     plt.barh(etichette2,percentuali2)
     plt.autoscale(True)
+    if save:
+        plt.savefig('res/immagini_output/istogramma.jpg')
     plt.show()
+
+
+def test_print_wordclouds(dao):
+    tipo='emoji'
+    emozione='anger'
+    print_wordclouds(dao,tipo,emozione)
 
 def test_upload_nuove_parole(dao):
     emozione='anger'
@@ -253,11 +269,12 @@ def test_upload_nuove_parole(dao):
 if __name__ == '__main__':
     DROP = False
     USE_BACKUP=True
-    dao = MongoDBDAO(config.MONGO_CONFIG)
-    # dao = MySQLDAO(config.MYSQL_CONFIG)
+    SAVE_IMAGES=True
+    # dao = MongoDBDAO(config.MONGO_CONFIG)
+    dao = MySQLDAO(config.MYSQL_CONFIG)
 
     # dao.test_connessione()
-    pipeline(dao,DROP,USE_BACKUP)
+    pipeline(dao,DROP,USE_BACKUP,SAVE_IMAGES)
     # test_upload_nuove_parole(dao)
     # make_histograms(dao)
     # delete_database(dao)

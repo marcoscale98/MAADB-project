@@ -30,3 +30,4 @@ class Risorse(Enum):
     EmoSN='EmoSN'
     NRC='NRC'
     sentisense='sentisense'
+    nuova_risorsa='nuova_risorsa'
