@@ -241,7 +241,7 @@ class MySQLDAO(DAO):
             res[obj[0]]=obj[2]
         return res
 
-    def delete_database(self):
+    def clear_databases(self):
         conn=self._connect()
         cursor = conn.cursor()
         cursor.execute("DROP DATABASE maadb_project")

@@ -28,9 +28,11 @@ def populate_db_lexres(dao,drop_if_not_empty):
         lemmi = {}
         start_path = f'res/Risorse_lessicali/Archive_risorse_lessicali/{str.capitalize(em)}/'
         end_path = f'_{em}.txt'
-        name_lex_res = ('EmoSN', 'NRC', 'sentisense')
         # trova i lemmi nelle lexical resources
-        for res in name_lex_res:
+        for res in Risorse:
+            if res==Risorse.nuova_risorsa:
+                continue
+            res=res.value
             try:
                 path = os.path.relpath(start_path + res + end_path)
 
@@ -48,7 +50,7 @@ def populate_db_lexres(dao,drop_if_not_empty):
                         lemma = fp.readline()
             except FileNotFoundError:
                 pass
-        lemmi = list(map(lambda kv: {"lemma": kv[0], "res": kv[1]}, lemmi.items()))
+        lemmi = list(map(lambda kv: {"lemma": kv[0], "risorse": kv[1]}, lemmi.items()))
         res_insert=dao.upload_lemmi_of_lexres(em, lemmi,drop_if_not_empty)
         print(f'Inseriti {res_insert} lemmi dell\'emozione {em}')
 
@@ -205,6 +207,8 @@ def trova_nuove_parole_nei_tweets(dao,emozione):
 
 
 def pipeline(dao:DAO,drop,use_backup,save_images):
+    if drop:
+        dao.clear_databases()
     populate_db_lexres(dao,drop)
     populate_db_twitter(dao,drop)
     for emozione in nomi_db_emozioni.Emotions:
@@ -236,7 +240,7 @@ def upload_nuove_parole_tweets(dao, emozione, nuove_parole):
     print(f'Inserite {n_inserted} nuove parole per {emozione}')
 
 def delete_database(dao):
-    dao.delete_database()
+    dao.clear_databases()
 
 def display_istogramma(dao, save=False):
     '''
@@ -274,6 +278,7 @@ if __name__ == '__main__':
     dao = MongoDBDAO(config.MONGO_CONFIG)
     # dao = MySQLDAO(config.MYSQL_CONFIG)
 
+    # dao.clear_databases()
     # dao.test_connessione()
     pipeline(dao,DROP,USE_BACKUP,SAVE_IMAGES)
     # test_upload_nuove_parole(dao)

@@ -190,7 +190,7 @@ Quelle in grassetto sono le emozioni presenti anche nei file di `Twitter messagg
 - DAL: The Dictionary of Affective Language developed by Whissell [Whissell 2009] contains words belonging to the dimensions of Pleasantness, Activation and Imagery. The 8,742 terms are rated in a three-point scale.
 ## Osservazioni modello dei dati
 ### Modello dei dati
-[Modello dei dati](res/conceptual-schema-data-project.pdf)
+[Modello dei dati](res/risorse_prof/conceptual-schema-data-project.pdf)
 ### Osservazioni
 - Per operare le generalizzazioni è più facile con MongoDB poichè i documenti si adattano più facilmente alle specializzazioni. In un futuro potrebbero aumentare le specializzazioni e quindi il modello di database a documento risulta più flessibile
 ## Informazioni amministrazione database

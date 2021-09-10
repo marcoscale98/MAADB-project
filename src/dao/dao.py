@@ -94,7 +94,7 @@ class DAO:
         '''
         raise InterfaceException
 
-    def delete_database(self):
+    def clear_databases(self):
         raise InterfaceException
 
     def _test_insert_parola(dao):

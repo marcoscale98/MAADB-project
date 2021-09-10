@@ -217,10 +217,13 @@ class MongoDBDAO(DAO):
         self._disconnect(coll)
         return res
 
-    def delete_database(self):
+    def clear_databases(self):
         for db_name in Nomi_db_mongo:
             db:Database=self._connect(db_name.value)
-            db.client.drop_database(db)
+            filter = {"name": {"$regex": r"^(?!system\.)"}}
+            collezioni=db.list_collection_names(filter=filter)
+            for coll in collezioni:
+                db.drop_collection(coll)
             self._disconnect(db)
 
     def _test_insert_parola(dao):

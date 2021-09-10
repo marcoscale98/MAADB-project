@@ -129,4 +129,6 @@ dmypy.json
 .pyre/
 
 #fatte da me
-res/
+res/risorse_prof
+res/Twitter_messaggi
+res/Risorse_lessicali
