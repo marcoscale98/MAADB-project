@@ -212,6 +212,7 @@ def pipeline(dao:DAO,drop,use_backup,save_images):
         print(f'\nEmozione: {emozione}')
         insert_tokens(dao,emozione,use_backup=use_backup,drop=drop)
         if type(dao)==MongoDBDAO:
+            print('Aggregazione dei tokens')
             aggregazione_mongo(dao,emozione,drop)
         for tipo in ('emoji','parola','hashtag','emoticon'):
             print_wordclouds(dao,tipo,emozione,save_images)
@@ -269,9 +270,9 @@ def test_upload_nuove_parole(dao):
 if __name__ == '__main__':
     DROP = False
     USE_BACKUP=True
-    SAVE_IMAGES=True
-    # dao = MongoDBDAO(config.MONGO_CONFIG)
-    dao = MySQLDAO(config.MYSQL_CONFIG)
+    SAVE_IMAGES=False
+    dao = MongoDBDAO(config.MONGO_CONFIG)
+    # dao = MySQLDAO(config.MYSQL_CONFIG)
 
     # dao.test_connessione()
     pipeline(dao,DROP,USE_BACKUP,SAVE_IMAGES)
