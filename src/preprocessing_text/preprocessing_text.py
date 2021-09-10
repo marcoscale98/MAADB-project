@@ -38,12 +38,12 @@ class Preprocessing():
         '''
         Serie di operazioni svolte:
         - [x] Eliminare USERNAME e URL
-        - [x] processare gli hashtag: possiamo contarli e fare statistiche anche su quelli o possiamo buttarli
-        - [x] processare emoji ed emoticons: contarli per fare statistiche e trovare sovrapposizioni di uso tra diverse emozioni
+        - [x] estrae gli hashtag
+        - [x] estrae emoji ed emoticons
         - [x] tokenization, lemmatization and pos tagging con *spacy*
         - [x] riconoscere le forme di slang e sostituirle con le forme lunghe
         - [x] eliminare stop words
-        - [x] rimuovere la punteggiatura
+        - [x] rimuove punteggiatura, parole mal formate ed eventuali caratteri speciali
         - [x] trasformare tutto a lower case
 
         :param frase:
@@ -65,6 +65,14 @@ class Preprocessing():
         return tweets_analizzati
 
     def secondo_processing(self,list_token):
+        '''
+        - [x] riconoscere le forme di slang e sostituirle con le forme lunghe
+        - [x] eliminare stop words
+        - [x] rimuove punteggiatura, parole mal formate ed eventuali caratteri speciali
+        - [x] trasformare tutto a lower case
+        :param list_token:
+        :return:
+        '''
         nuovi_tokens = self.slang_words_processing(list_token)
         # remove stop words
         without_stop_words = [t for t in nuovi_tokens if t['token'] not in stopwords.words('english')]
@@ -80,7 +88,14 @@ class Preprocessing():
         return parole_senza_punteggiatura
 
     def primo_processing(self,frase):
-        frase = self.replace_username_url(frase)
+        '''
+        - [x] Eliminare USERNAME e URL
+- [x] estrae gli hashtag
+- [x] estrae emoji ed emoticons
+        :param frase:
+        :return:
+        '''
+        frase = self.remove_username_url(frase)
         frase, hashtags = self.extract_hashtags(frase)
         frase, list_ems = self.extract_emoji(frase)
         frase, emoticons = self.search_emoticons(frase)
@@ -104,7 +119,11 @@ class Preprocessing():
         return nuovi_tokens
 
     def spacy_processing(self,frasi: Generator) -> Generator:
-        # tokenization, lemmatization and pos tagging
+        '''
+        - [x] tokenization, lemmatization and pos tagging con *spacy*
+        :param frasi:
+        :return:
+        '''
         docs = self.nlp.pipe(frasi,n_process=8)
 
         def extract_token(doc):
@@ -134,7 +153,7 @@ class Preprocessing():
             frase = frase.replace(h, "", 1)
         return frase, hashtags
 
-    def replace_username_url(self,frase):
+    def remove_username_url(self, frase):
         frase = frase.replace("USERNAME", "").replace("URL", "")
         return frase
 
@@ -168,6 +187,10 @@ class Preprocessing():
         return res
 
     def _test_save_and_load(self):
+        '''
+        deprecate
+        :return:
+        '''
         res=self._test_preprocessing()
         self.save_preprocessing(res,'prova')
         dati_salvati=self.load_preprocessed('prova')

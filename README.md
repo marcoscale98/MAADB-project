@@ -79,12 +79,14 @@ Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:
 ![](res/immagini_readme/risorsa_lessicale_table_schema.png)
 #### Pipeline di **preprocessing** dei tweets in python
 - [x] Eliminare USERNAME e URL
-- [x] processare gli hashtag: possiamo contarli e fare statistiche anche su quelli o possiamo buttarli
-- [x] processare emoji ed emoticons: contarli per fare statistiche e trovare sovrapposizioni di uso tra diverse emozioni
+- [x] estrae gli hashtag
+- [x] estrae emoji ed emoticons
+
 - [x] tokenization, lemmatization and pos tagging con *spacy*
+
 - [x] riconoscere le forme di slang e sostituirle con le forme lunghe
 - [x] eliminare stop words
-- [x] remove punteggiatura, parole mal formate e eventuali caratteri speciali
+- [x] rimuove punteggiatura, parole mal formate ed eventuali caratteri speciali
 - [x] trasformare tutto a lower case
 
 #### Database di analytics
