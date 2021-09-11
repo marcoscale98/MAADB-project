@@ -152,8 +152,7 @@ ALTER TABLE `parola`
 -- Indici per le tabelle `parola_contenuta`
 --
 ALTER TABLE `parola_contenuta`
-  ADD PRIMARY KEY (`parola`,`emozione`),
-  ADD FOREIGN KEY (parola) REFERENCES parola(parola);
+  ADD PRIMARY KEY (`parola`,`emozione`);
 
 --
 -- Indici per le tabelle `risorsa_lessicale`
@@ -181,6 +180,7 @@ ALTER TABLE `risorsa_lessicale`
 --
 -- Limiti per le tabelle scaricate
 --
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

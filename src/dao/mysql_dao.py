@@ -62,8 +62,8 @@ class MySQLDAO(DAO):
             parole.append((lemma['lemma'],))
             for res in resources:
                 parole_per_ris_les.append((res, emozione, lemma['lemma']))
-        self._insert_parole(cursor, parole)
         self._insert_parole_in_ris_les(cursor, parole_per_ris_les)
+        self._insert_parole(cursor, parole)
         self._disconnect(conn)
         return len(parole_per_ris_les)
 
@@ -91,16 +91,14 @@ class MySQLDAO(DAO):
 
     def upload_words(self, words: List[Union[str, dict]], emotion: str):
         if len(words)==0: return 0
-
-        query = f'INSERT IGNORE INTO {Nomi_db_mysql.PAROLA.value} (parola) values (%s)'
-        conn = self._connect()
-        cursor = conn.cursor()
-        cursor.executemany(query, [(word,) for word in words])
-        self._disconnect(conn)
-
         query = f'INSERT IGNORE INTO {Nomi_db_mysql.PAROLA_CONTENUTA.value} (parola,emozione,quantita) values (%s,%s,%s)'
         self._upload_tokens(words, emotion, query)
 
+        query=f'INSERT IGNORE INTO {Nomi_db_mysql.PAROLA.value} (parola) values (%s)'
+        conn=self._connect()
+        cursor=conn.cursor()
+        cursor.executemany(query,[(word,) for word in words])
+        self._disconnect(conn)
         return len(words)
 
     def upload_emoji(self, emoji, emotion):
@@ -166,7 +164,6 @@ class MySQLDAO(DAO):
         print("Connessione effettuata con successo")
 
     def upload_nuove_parole_tweets(self, parole, emozione):
-        # non ho bisogno di inserirle prima in `parola` perchè sono sicuro che sono già contenute in `parola_contenuta`
         conn=self._connect(Nomi_db_mysql.RISORSA_LESSICALE.value,emozione)
         cursor=conn.cursor()
         query=f'INSERT IGNORE INTO {Nomi_db_mysql.RISORSA_LESSICALE.value} (parola,emozione,risorsa) values (%s,%s,%s)'
