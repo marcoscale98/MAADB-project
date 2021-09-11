@@ -162,7 +162,7 @@ def print_wordclouds(dao:DAO,tipo:str,emozione:str,save=False):
     plt.axis("off")
     if save:
         path=os.path.join('res','immagini_output',f'{emozione}-{tipo}.jpg')
-        plt.savefig(path)
+        plt.savefig(path,transparent=True)
     plt.show()
 
 def calcolo_parole_shared(dao:DAO, emozione:str):
@@ -219,7 +219,9 @@ def pipeline(dao:DAO,drop,use_backup,save_images):
             print('Aggregazione dei tokens')
             aggregazione_mongo(dao,emozione,drop)
         for tipo in ('emoji','parola','hashtag','emoticon'):
+            print(f'Visualizzo word_cloud per {tipo}')
             print_wordclouds(dao,tipo,emozione,save_images)
+    print("Visualizzo istogramma")
     display_istogramma(dao, save_images)
     print('\n')
     for emozione in nomi_db_emozioni.Emotions:
@@ -232,7 +234,9 @@ def display_wordclouds_istogramma(dao,save_images):
         emozione=emozione.value
         print(f'\nEmozione: {emozione}')
         for tipo in ('emoji','parola','hashtag','emoticon'):
+            print(f'Visualizzo word_cloud per {tipo}')
             print_wordclouds(dao,tipo,emozione,save_images)
+    print("Visualizzo istogramma")
     display_istogramma(dao, save_images)
 
 def upload_nuove_parole_tweets(dao, emozione, nuove_parole):
@@ -257,7 +261,7 @@ def display_istogramma(dao, save=False):
     plt.barh(etichette2,percentuali2)
     plt.autoscale(True)
     if save:
-        plt.savefig('res/immagini_output/istogramma.jpg')
+        plt.savefig('res/immagini_output/istogramma.jpg',transparent=True)
     plt.show()
 
 
@@ -272,15 +276,16 @@ def test_upload_nuove_parole(dao):
     upload_nuove_parole_tweets(dao, emozione, nuove_parole)
 
 if __name__ == '__main__':
-    DROP = False
-    USE_BACKUP=True
-    SAVE_IMAGES=False
+    DROP = True
+    USE_BACKUP=False
+    SAVE_IMAGES=True
     dao = MongoDBDAO(config.MONGO_CONFIG)
     # dao = MySQLDAO(config.MYSQL_CONFIG)
 
     # dao.clear_databases()
     # dao.test_connessione()
     pipeline(dao,DROP,USE_BACKUP,SAVE_IMAGES)
+    # display_wordclouds_istogramma(dao,SAVE_IMAGES)
     # test_upload_nuove_parole(dao)
     # make_histograms(dao)
     # delete_database(dao)

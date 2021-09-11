@@ -3,17 +3,15 @@ qui inserirò le funzioni per fare map-reduce sull'output del preprocessing
 il risultato della map-reduce verrà inviato al MySQL DB
 
 '''
-import itertools
+from itertools import chain
 from itertools import groupby
-from functools import reduce
 from itertools import tee
 from pprint import pprint
-from typing import Generator, Iterator
-from itertools import chain
+from typing import Iterator
 
 from src.dao.mysql_dao import MySQLDAO
 from src.preprocessing_text.preprocessing_text import Preprocessing
-from src.utils import nomi_db_emozioni,config
+from src.utils import config
 
 
 def _reduce(lista):
@@ -60,8 +58,8 @@ def test_agggregate():
     dao=MySQLDAO(config.MYSQL_CONFIG)
     gen_mess=dao.download_messaggi_twitter('anger',10)
     gen_mess=(tweet['message'] for tweet in gen_mess)
-    prep=Preprocessing()
-    tweets_prep=prep(gen_mess)
+    prep=Preprocessing('prova')
+    tweets_prep=prep.preprocessing_text(gen_mess)
     hashtags,emoticons,emojis,parole=aggregazione(tweets_prep.values())
     print('HASHTAGS')
     pprint(hashtags, indent=2)
