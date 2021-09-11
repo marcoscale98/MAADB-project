@@ -15,8 +15,9 @@ Python 3.9
 - [x] riconoscere le forme di slang e sostituirle con le forme lunghe
 - [x] eliminare stop words
 - [x] rimuove punteggiatura, parole mal formate ed eventuali caratteri speciali
-- [x] trasformare tutto a lower case
+- [x] trasformare tutto a lower case 
 
+Ho usato `re` e `spacy`
 ##### Oggetto di output
 ````
 {
