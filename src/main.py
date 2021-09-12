@@ -266,9 +266,9 @@ def display_istogramma(dao, save=False):
 
 
 def test_print_wordclouds(dao):
-    tipo='emoji'
-    emozione='anger'
-    print_wordclouds(dao,tipo,emozione)
+    tipo='parola'
+    emozione='trust'
+    print_wordclouds(dao,tipo,emozione, save=True)
 
 def test_upload_nuove_parole(dao):
     emozione='anger'
@@ -284,8 +284,9 @@ if __name__ == '__main__':
 
     # dao.clear_databases()
     # dao.test_connessione()
-    pipeline(dao,DROP,USE_BACKUP,SAVE_IMAGES)
+    # pipeline(dao,DROP,USE_BACKUP,SAVE_IMAGES)
     # display_wordclouds_istogramma(dao,SAVE_IMAGES)
+    test_print_wordclouds(dao)
     # test_upload_nuove_parole(dao)
     # make_histograms(dao)
     # delete_database(dao)
