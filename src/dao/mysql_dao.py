@@ -242,10 +242,12 @@ class MySQLDAO(DAO):
         return res
 
     def clear_databases(self):
-        conn=self._connect()
-        cursor = conn.cursor()
-        cursor.execute("DROP DATABASE maadb_project")
-        self._disconnect(conn)
+        for table in Nomi_db_mysql:
+            table=table.value
+            conn=self._connect()
+            cursor = conn.cursor()
+            cursor.execute(f"TRUNCATE TABLE {table}")
+            self._disconnect(conn)
 
     def _test_insert_parola(dao):
         super()._test_insert_parola()
