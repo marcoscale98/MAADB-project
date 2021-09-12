@@ -67,7 +67,7 @@ Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:
 ````
 {
     _id: ObjectId(...),
-    message: str,
+    messaggio: str,
 }
 ````
 ###### MySQL
@@ -100,7 +100,7 @@ Per ogni collezione corrispondente ad una emozione abbiamo il seguente schema:
     token: str,
     lemma: Optional[str],
     pos: Optional[str],
-    type: <"word","emoji","emoticon","hashtag">,
+    tipo: <"word","emoji","emoticon","hashtag">,
 }
 ````
 a cui verrà aggiunto il campo `quant` (quantità del lemma trovato)

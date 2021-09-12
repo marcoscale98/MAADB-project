@@ -58,7 +58,7 @@ class MySQLDAO(DAO):
         parole_per_ris_les = []
         parole = []
         for lemma in lemmi:
-            resources = lemma['res'].keys()
+            resources = lemma['risorse'].keys()
             parole.append((lemma['lemma'],))
             for res in resources:
                 parole_per_ris_les.append((res, emozione, lemma['lemma']))

@@ -276,17 +276,17 @@ def test_upload_nuove_parole(dao):
     upload_nuove_parole_tweets(dao, emozione, nuove_parole)
 
 if __name__ == '__main__':
-    DROP = True
-    USE_BACKUP=False
-    SAVE_IMAGES=True
-    dao = MongoDBDAO(config.MONGO_CONFIG)
-    # dao = MySQLDAO(config.MYSQL_CONFIG)
+    DROP = False
+    USE_BACKUP=True
+    SAVE_IMAGES=False
+    # dao = MongoDBDAO(config.MONGO_CONFIG)
+    dao = MySQLDAO(config.MYSQL_CONFIG)
 
     # dao.clear_databases()
     # dao.test_connessione()
-    # pipeline(dao,DROP,USE_BACKUP,SAVE_IMAGES)
+    pipeline(dao,DROP,USE_BACKUP,SAVE_IMAGES)
     # display_wordclouds_istogramma(dao,SAVE_IMAGES)
-    test_print_wordclouds(dao)
+    # test_print_wordclouds(dao)
     # test_upload_nuove_parole(dao)
     # make_histograms(dao)
     # delete_database(dao)
