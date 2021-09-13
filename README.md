@@ -3,7 +3,7 @@ Progetto d'esame per MAADB
 ## Versione di Python
 Python 3.9
 ## Schema di lavoro
-[Descrizione progetto](https://docs.google.com/document/d/1i3TSJpyr4vw-edKBX1XNuy52f8_Sem0aPWmo6fBpuBs/edit?ts=57308c63#heading=h.oublcismo327)
+[Descrizione progetto](https://docs.google.com/document/d/1i3TSJpyr4vw-edKBX1XNuy52f8_Sem0aPWmo6fBpuBs/edit?ts=57308c63#heading=h.oublcismo327)  
 [Materiale per progetto software su Twitter](https://informatica.i-learn.unito.it/mod/folder/view.php?id=154562)
 []()
 ### Cosa c'è da creare?
